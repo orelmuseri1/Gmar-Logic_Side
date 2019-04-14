@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.jar.JarException;
 
 
 
@@ -32,24 +33,27 @@ public class Asker {
 	
 	int ask() {
 		Connection myConn = null;
-		int countermsg = 0; //counting how match msg he send to the system in this run
 		try {
+			sender.send(12,"10"+"/"+"4"+"/"+"2019","10"+":"+"12"+ ":" + "05","לא תקין","Water", "the kid doesn't drink enought today");
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} // the function that makes the alert
+		int countermsg = 0; //counting how match msg he send to the system in this run
+		try { 
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);			
-			 if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-				 countermsg += DailyWaterChack(myConn,1);
+			if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
+				countermsg += DailyWaterChack(myConn,1); 
 			 }
 			 if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
 				countermsg += DailyWaterChack(myConn,2);
-				 countermsg += XDaysEgoWaterChack(myConn);
+				countermsg += XDaysEgoWaterChack(myConn);
 			 	}
-			 
 			//countermsg+= firstquery(myConn);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
 		return countermsg;
 	}
 	
@@ -106,9 +110,13 @@ public class Asker {
 			String giveMeAllKids= "SELECT * FROM child";
 			ResultSet kids= mystmt.executeQuery(giveMeAllKids);//sent the query to get all the kids
 			String [] today = LocalDate.now().toString().split("-");
-			String[] dateEvent,temp;
-			int counterWater = 0;
-			
+			String[] dateEvent,temp,nowtime;
+			int counterWater = 0,hour,min,sec;
+			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+			nowtime = timeStamp.split("_");									//getting the date and the time of the event a
+			 hour = (nowtime[1].charAt(0)-'0')*10 +nowtime[1].charAt(1)-'0';
+			 min = (nowtime[1].charAt(2)-'0')*10 +nowtime[1].charAt(3)-'0';
+			 sec = (nowtime[1].charAt(4)-'0')*10 +nowtime[1].charAt(5)-'0';
 			while(kids.next()) {																			// pass all the kids 
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid
 				String giveMeAllEvents = "SELECT * FROM Water WHERE child = " + kids.getString("childID"); 	//the query to get all the event in Water for this kid
@@ -132,14 +140,24 @@ public class Asker {
 				}
 				if(time == 1) {
 					if(counterWater<600) { 		// if he drink less than he actualy need near to the end of the day
-						sender.send(kids.getString("firstName")+" "+kids.getString("lastName"), "the kid doesn't drink enough"); // the function that makes the alert
+						try {
+							sender.send(kids.getInt("childID"),today[2]+"/"+today[1]+"/"+today[0],hour+":"+min+ ":" + sec,"לא תקין","Water", "!הילד לא שתה מספיק מים היום");
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} // the function that makes the alert
 						value++;
 					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mine everything ok
 						counterWater=0;
 				}
 				if(time == 2) {
 					if(counterWater<300) { 		// if he drink less than he actualy need in the half of the day
-						sender.send(kids.getString("firstName")+" "+kids.getString("lastName"), "the kid doesn't drink enough"); // the function that makes the alert
+						try {
+							sender.send(kids.getInt("childID"),today[2]+"/"+today[1]+"/"+today[0],hour+":"+min+ ":" + sec,"לא תקין","Water", "הילד לא שתה מספיק מים היום!");
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} // the function that makes the alert
 						value++;
 					}else System.out.println(kids.getString("firstName")+ " " + counterWater); // no need actuely to pay attention for else cuz its mine everything ok
 						counterWater=0;
@@ -162,9 +180,13 @@ public class Asker {
 			String giveMeAllKids= "SELECT * FROM child";
 			ResultSet kids= mystmt.executeQuery(giveMeAllKids);//sent the query to get all the kids
 			String [] today = LocalDate.now().toString().split("-");
-			String[] dateEvent,temp;
-			int counterWater = 0;
-			
+			String[] dateEvent,temp,nowtime;
+			int counterWater = 0,hour,min,sec;
+			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+			nowtime = timeStamp.split("_");									//getting the date and the time of the event a
+			 hour = (nowtime[1].charAt(0)-'0')*10 +nowtime[1].charAt(1)-'0';
+			 min = (nowtime[1].charAt(2)-'0')*10 +nowtime[1].charAt(3)-'0';
+			 sec = (nowtime[1].charAt(4)-'0')*10 +nowtime[1].charAt(5)-'0';
 			while(kids.next()) {																			// pass all the kids 
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid and his ID
 				String giveMeAllEvents = "SELECT * FROM Water WHERE child = " + kids.getString("childID"); 	//the query to get all the event in Water for this kid
@@ -187,10 +209,15 @@ public class Asker {
 					}
 				}
 					if(counterWater<1350) { 		// if he drink less than he actualy need near to the end of the day
-						sender.send(kids.getString("firstName")+" "+kids.getString("lastName"), "the kid doesn't drink enough"); // the function that makes the alert
+						try {
+							sender.send(kids.getInt("childID"),today[2]+"/"+today[1]+"/"+today[0],hour+":"+min+ ":" + sec,"לא תקין","Water", "הילד לא שתה מספיק מים היום!");
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} // the function that makes the alert
 						value++;
-					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mine everything ok
-						counterWater=0;
+					}
+					counterWater=0;
 			}
 			
 		} catch (SQLException e) {
@@ -207,7 +234,6 @@ public class Asker {
 		String[] time;
 		if((starthour>finishhour)||( starthour==finishhour&&startmin>finishmin)) {
 			return false;}
-		
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 		time = timeStamp.split("_");									//getting the date and the time of the event a
 		 hour = (time[1].charAt(0)-'0')*10 +time[1].charAt(1)-'0';
