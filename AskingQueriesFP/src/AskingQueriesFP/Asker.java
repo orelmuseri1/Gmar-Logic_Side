@@ -5,9 +5,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.jar.JarException;
 
 
@@ -31,31 +33,22 @@ public class Asker {
 		}
 	
 	
-	int ask() {
+	int ask() throws ParseException, SQLException {
 		Connection myConn = null;
-		try {
-			sender.send(12,"10"+"/"+"4"+"/"+"2019","10"+":"+"12"+ ":" + "05","לא תקין","Water", "the kid doesn't drink enought today");
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} // the function that makes the alert
+		//sender.send(12,"10"+"/"+"4"+"/"+"2019","10"+":"+"12"+ ":" + "05","לא תקין","Water", "the kid doesn't drink enought today"); 	// the function that makes the alert
 		int countermsg = 0; //counting how match msg he send to the system in this run
-		try { 
-			myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);			
-			if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-				countermsg += DailyWaterChack(myConn,1); 
+		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);			
+		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
+			countermsg += DailyWaterChack(myConn,1); 
+			}
+		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
+			countermsg += DailyWaterChack(myConn,2);
+			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun"))
+			countermsg += XDaysEgoWaterChack(myConn);
 			 }
-			 if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-				countermsg += DailyWaterChack(myConn,2);
-				countermsg += XDaysEgoWaterChack(myConn);
-			 	}
 			//countermsg+= firstquery(myConn);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return countermsg;
-	}
+		}
 	
 	/*int firstquery(Connection myConn) {
 		
@@ -245,4 +238,12 @@ public class Asker {
 		 else return false;
 	}
 	
+	String WhatIsTheDay() throws ParseException { //function that give me the 3 first latter of the name of today 
+		String timeStamp = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ENGLISH);
+		Date myDate = sdf.parse(timeStamp);
+		sdf.applyPattern("EEE");
+		String sMyDate = sdf.format(myDate);
+		return sMyDate;
+	}
 }
