@@ -50,50 +50,7 @@ public class Asker {
 		return countermsg;
 		}
 	
-	/*int firstquery(Connection myConn) {
 		
-		try {
-			Statement mystmt = myConn.createStatement();
-			String sql = "SELECT * FROM child";
-			
-			ResultSet myres= mystmt.executeQuery(sql);
-			String [] today = LocalDate.now().toString().split("-");
-
-			while(myres.next()) {
-				System.out.println(myres.getString("firstName") + "," + myres.getString("childID")); // print the name of the kid
-				String sql2 = "SELECT * FROM LiquidFood WHERE child = " + myres.getString("childID");//get all the event in LiquidFood for this kid
-				String sql3 = "SELECT * FROM SolidFood WHERE child = " + myres.getString("childID");//get all the event in SolidFood for this kid
-				Statement mystmt2 = myConn.createStatement();
-				Statement mystmt3 = myConn.createStatement();
-				ResultSet myres2= mystmt2.executeQuery(sql2);
-				ResultSet myres3= mystmt3.executeQuery(sql3);
-				String[] date,temp,time;
-				while(myres2.next()) {
-					date = myres2.getString("eventDate").split("/");
-					temp = date[2].toString().split(",");
-					date[2]=temp[0];
-					time = temp[1].toString().split(":");
-					for(int i =0;i<time.length;i++)
-						System.out.println(time[i]);
-					if(date[2].equals(today[0])) {
-					System.out.println("the event for this kid: "+ myres2.getString("child")+"-"+ myres2.getString("eventType")+"-"+ myres2.getString("eventDate")+ "-" + myres2.getString("amount") + "-" + myres2.getString("staff"));
-						//for(String s:)System.out.println(s);
-					}
-					}
-					while(myres3.next())
-					System.out.println("the event for this kid: "+ myres3.getString("child")+"-"+ myres3.getString("eventType")+"-"+ myres3.getString("eventDate")+ "-" + myres3.getString("amount") + "-" + myres3.getString("staff"));
-				
-			
-			}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return 0;
-		}
-		
-		return 1;
-	}
-	*/
-	
 	
 	 // check the amount of water every child drink in the end of the day and the midlle of the day
 	int DailyWaterChack(Connection myConn, int time) {
@@ -228,10 +185,9 @@ public class Asker {
 		if((starthour>finishhour)||( starthour==finishhour&&startmin>finishmin)) {
 			return false;}
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-		time = timeStamp.split("_");									//getting the date and the time of the event a
+		time = timeStamp.split("_");	
 		 hour = (time[1].charAt(0)-'0')*10 +time[1].charAt(1)-'0';
 		 min = (time[1].charAt(2)-'0')*10 +time[1].charAt(3)-'0';
-		// System.out.println(hour+":"+ min +"/"+starthour+":"+startmin +"-"+finishhour+ ":" + finishmin);
 		 if(((hour > starthour) && (hour < finishhour))||((hour == starthour&&min>=startmin) && (hour == finishhour&&min<=finishmin))||((hour == starthour&&min>=startmin) && (hour >= finishhour))||((hour > starthour) && (hour == finishhour&&min<=finishmin))) {
 		return true;
 		}
