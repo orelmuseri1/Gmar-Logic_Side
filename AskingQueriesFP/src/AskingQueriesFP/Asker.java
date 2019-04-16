@@ -241,9 +241,6 @@ public class Asker {
 	
 	
 	
-	
-	
-	
 	//function that get time of start and the end and check if now is between  them
 	boolean checkTime(int starthour,int startmin,int finishhour,int finishmin) { 
 		int hour,min; 
