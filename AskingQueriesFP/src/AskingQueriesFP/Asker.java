@@ -35,38 +35,33 @@ public class Asker {
 	
 	int ask() throws ParseException, SQLException {
 		Connection myConn = null;
-		//sender.send(12,"10"+"/"+"4"+"/"+"2019","10"+":"+"12"+ ":" + "05","לא תקין","Water", "the kid doesn't drink enought today"); 	// the function that makes the alert
 		int countermsg = 0; //counting how match msg he send to the system in this run
-		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);			
-		countermsg += DailyFoodChack(myConn,WhatIsTheDate());
+		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
+		countermsg +=DailyDiaperChack(myConn,WhatIsTheDate(),1,getKids(myConn));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-			countermsg += DailyWaterChack(myConn,1,WhatIsTheDate()); 
+			countermsg += DailyWaterChack(myConn,1,WhatIsTheDate(),getKids(myConn)); 
+			countermsg += DailyFoodChack(myConn,WhatIsTheDate(),1,getKids(myConn));
 			}
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			countermsg += DailyWaterChack(myConn,2,WhatIsTheDate());
-			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun"))
-			countermsg += XDaysEgoWaterChack(myConn,WhatIsTheDate());
+			countermsg += DailyWaterChack(myConn,2,WhatIsTheDate(),getKids(myConn));
+			countermsg += DailyFoodChack(myConn,WhatIsTheDate(),2,getKids(myConn));
+			//if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun"))
+			countermsg += XDaysEgoWaterChack(myConn,WhatIsTheDate(),getKids(myConn));
 			 }
-			//countermsg+= firstquery(myConn);
 		return countermsg;
 		}
 	
-		
+		//=====================================================================querys=====================================================================//
 	
 	 // check the amount of water every child drink in the end of the day and the midlle of the day
-	int DailyWaterChack(Connection myConn, int time,String[] today) {
+	int DailyWaterChack(Connection myConn, int time,String[] today,ResultSet kids) {
 		int value=0;
 		try {
-			Statement mystmt = myConn.createStatement();
-			String giveMeAllKids= "SELECT * FROM child";
-			ResultSet kids= mystmt.executeQuery(giveMeAllKids);//sent the query to get all the kids
 			String[] dateEvent,temp;
 			int counterWater = 0;
-			while(kids.next()) {																			// pass all the kids 
-				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid
-				String giveMeAllEvents = "SELECT * FROM Water WHERE child = " + kids.getString("childID"); 	//the query to get all the event in Water for this kid
-				Statement mystmt2 = myConn.createStatement(); 												//creating statement
-				ResultSet events= mystmt2.executeQuery(giveMeAllEvents);									//execute the query
+			while(kids.next()) {															// pass all the kids 
+				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
+				ResultSet events= getSet(myConn, kids.getString("childID"), "Water");
 				while(events.next()) {																		//pass all the events
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
@@ -116,21 +111,15 @@ public class Asker {
 	}
 	
 	//check the amount of water every child drink in the pass coupl days(3)
-	// needed to asked near to the end of the day
-	int XDaysEgoWaterChack(Connection myConn,String[] today) { 
+	int XDaysEgoWaterChack(Connection myConn,String[] today,ResultSet kids) { 
 		int value=0;
 		try {
-			Statement mystmt = myConn.createStatement();
-			String giveMeAllKids= "SELECT * FROM child";
-			ResultSet kids= mystmt.executeQuery(giveMeAllKids);//sent the query to get all the kids
 			String[] dateEvent,temp;
 			int counterWater = 0;
 
 			while(kids.next()) {																			// pass all the kids 
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid and his ID
-				String giveMeAllEvents = "SELECT * FROM Water WHERE child = " + kids.getString("childID"); 	//the query to get all the event in Water for this kid
-				Statement mystmt2 = myConn.createStatement(); 												//creating statement
-				ResultSet events= mystmt2.executeQuery(giveMeAllEvents);									//execute the query
+				ResultSet events=getSet(myConn, kids.getString("childID"), "Water");	
 				while(events.next()) {																		//pass all the events
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
@@ -168,20 +157,15 @@ public class Asker {
 	
 	
 	
-	
-	int DailyFoodChack(Connection myConn,String[] today) {
+	//check the amount of food the every kid eat today
+	int DailyFoodChack(Connection myConn,String[] today,int time,ResultSet kids) {
 		int value=0;
 		try {
-			Statement mystmt = myConn.createStatement();
-			String giveMeAllKids= "SELECT * FROM child";
-			ResultSet kids= mystmt.executeQuery(giveMeAllKids);//sent the query to get all the kids
 			String[] dateEvent,temp;
 			float counterWater = 0;
 			while(kids.next()) {																				// pass each kid
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid
-				String giveMeAllEvents = "SELECT * FROM SolidFood WHERE child = " + kids.getString("childID"); 	//the query to get all the event in Water for this kid
-				Statement mystmt2 = myConn.createStatement(); 													//creating statement
-				ResultSet events = mystmt2.executeQuery(giveMeAllEvents);										//execute the query
+				ResultSet events = getSet(myConn, kids.getString("childID"), "SolidFood");	
 				while(events.next()) {																			//pass all the events
 					dateEvent = events.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
@@ -199,9 +183,7 @@ public class Asker {
 					}					
 				}
 				// need to know what is the real amout of food that need to count
-				String giveMeAllEvents2 = "SELECT * FROM LiquidFood WHERE child = " + kids.getString("childID"); 	//the query to get all the event in Water for this kid
-				Statement mystmt3 = myConn.createStatement(); 													//creating statement
-				ResultSet events2 = mystmt3.executeQuery(giveMeAllEvents2);										//execute the query
+				ResultSet events2 =  getSet(myConn, kids.getString("childID"), "LiquidFood");		
 				while(events2.next()) {
 					dateEvent = events2.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
@@ -219,7 +201,19 @@ public class Asker {
 						
 					}
 				}
-				System.out.println(counterWater);
+				if(time == 1) {
+					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
+						try {
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Food","הילד לא אכל היום מספיק!"); // the function that makes the alert
+							value++;
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mean everything ok
+						counterWater=0;
+				}
+				if(time == 2) {
 					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
 							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Food","הילד לא אכל היום מספיק!"); // the function that makes the alert
@@ -227,9 +221,85 @@ public class Asker {
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
+						}
+					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mean everything ok
+						counterWater=0;
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	
+	
+	//check if the kid was" in the "toalet" today
+	int DailyDiaperChack(Connection myConn,String[] today,int time,ResultSet kids) {
+		int value=0;
+		try {
+			String[] dateEvent,temp;
+			float counterWater = 0;
+			while(kids.next()) {																				// pass each kid
+				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid											//creating statement
+				ResultSet events = getSet(myConn, kids.getString("childID"), "Urine");	
+				while(events.next()) {																			//pass all the events
+					dateEvent = events.getString("eventDate").split("/");										//getting the date and the time of the event a
+					temp = dateEvent[2].toString().split(",");
+					dateEvent[2]=temp[0];
+					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
+						//System.out.println(events.getString("child")+ "-" + events.getString("amount") + "-" + events.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
+						if(events.getString("amount").equals("חיתול מלא"))	{								//checking the amount he drink and sum the amount he drink all day
+							counterWater += 1;}
+						else if(events.getString("amount").equals("כמות רגילה")) {
+							counterWater += 0.6;}
+						else if(events.getString("amount").equals("כמות קטנה")) {
+							counterWater += 0.4;}
+						else if(events.getString("amount").equals("ללא")) {
+							counterWater += 0;}
+					}					
+				}
+				// need to know what is the real amout of food that need to count
+				ResultSet events2 =getSet(myConn, kids.getString("childID"), "Feces");						//execute the query
+				while(events2.next()) {
+					dateEvent = events2.getString("eventDate").split("/");										//getting the date and the time of the event a
+					temp = dateEvent[2].toString().split(",");
+					dateEvent[2]=temp[0];
+					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) {  //if the date of the event is today
+						//System.out.println(events2.getString("child")+ "-" + events2.getString("amount") + "-" + events2.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
+						if(events2.getString("amount").equals("חיתול מלא")) {									//checking the amount he drink and sum the amount he drink all day
+							counterWater += 1;}
+						else if(events2.getString("amount").equals("כמות רגילה")) {
+							counterWater += 0.6;}
+						else if(events2.getString("amount").equals("כמות קטנה")) {
+							counterWater += 0.4;}
+						else if(events2.getString("amount").equals("ללא")) {
+							counterWater += 0;}
+						
 					}
-				}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mean everything ok
-					counterWater=0;
+				}
+				if(time == 1) {
+					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
+						try {
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Feces/Urine","כמות הצואה/שתן קטנה"); // the function that makes the alert
+							value++;
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}counterWater=0;
+				}else if(time == 2) {
+					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
+						try {
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Feces/Urine","הילד לא אכל היום מספיק!"); // the function that makes the alert
+							value++;
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}counterWater=0;
+				}
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -239,7 +309,7 @@ public class Asker {
 	}
 	
 	
-	
+	//================================================================using function====================================================================//
 	
 	//function that get time of start and the end and check if now is between  them
 	boolean checkTime(int starthour,int startmin,int finishhour,int finishmin) { 
@@ -256,8 +326,9 @@ public class Asker {
 		}
 		 else return false;
 	}
-	
-	String WhatIsTheDay() throws ParseException { //function that give me the 3 first latter of the name of today 
+
+	//function that give me the 3 first latter of the name of today 
+	String WhatIsTheDay() throws ParseException { 
 		String timeStamp = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().getTime());
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ENGLISH);
 		Date myDate = sdf.parse(timeStamp);
@@ -283,4 +354,21 @@ public class Asker {
 		now[5] = sec;
 		return now;
 	}
+
+
+	ResultSet getKids(Connection myConn) throws SQLException {
+		Statement mystmt = myConn.createStatement();
+		String giveMeAllKids= "SELECT * FROM child";
+		ResultSet kids= mystmt.executeQuery(giveMeAllKids);//sent the query to get all the kids
+		return kids;
+	}
+	
+	
+	ResultSet getSet(Connection myConn,String kid,String tableName) throws SQLException {
+		Statement mystmt = myConn.createStatement();
+		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE child = "+kid;
+		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
+		return events;
+	}
+	
 }
