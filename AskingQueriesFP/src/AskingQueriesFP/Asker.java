@@ -33,28 +33,58 @@ public class Asker {
 		}
 	
 	
-	int ask() throws ParseException, SQLException {
+	int ask() throws Exception {
 		Connection myConn = null;
 		int countermsg = 0; //counting how match msg he send to the system in this run
 		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
-		countermsg +=DailyDiaperChack(myConn,WhatIsTheDate(),1,getKids(myConn));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-			countermsg += DailyWaterChack(myConn,1,WhatIsTheDate(),getKids(myConn)); 
-			countermsg += DailyFoodChack(myConn,WhatIsTheDate(),1,getKids(myConn));
+			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
+			countermsg += DailyWaterCheck(myConn,1,WhatIsTheDate(),getKids(myConn)); 
+			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			}
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			countermsg += DailyWaterChack(myConn,2,WhatIsTheDate(),getKids(myConn));
-			countermsg += DailyFoodChack(myConn,WhatIsTheDate(),2,getKids(myConn));
-			//if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun"))
-			countermsg += XDaysEgoWaterChack(myConn,WhatIsTheDate(),getKids(myConn));
+			countermsg += DailyVomitusCheck(myConn, WhatIsTheDate(), getKids(myConn));
+			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
+			countermsg += DailyWaterCheck(myConn,2,WhatIsTheDate(),getKids(myConn));
+			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
+			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun"))
+				countermsg += XDaysEgoWaterCheck(myConn,WhatIsTheDate(),getKids(myConn));
 			 }
 		return countermsg;
 		}
 	
 		//=====================================================================querys=====================================================================//
+	int DailyVomitusCheck(Connection myConn,String[] today,ResultSet kids) throws Exception {
+		int value=0;
+		try {
+			String[] dateEvent,temp;
+			int counter=0;
+			while(kids.next()) {															// pass all the kids 
+				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
+				ResultSet events= getSet(myConn, kids.getString("childID"), "Vomitus");
+				while(events.next()) {																		//pass all the events
+					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
+					temp = dateEvent[2].toString().split(",");
+					dateEvent[2]=temp[0];
+					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
+							counter++;
+						}
+				}
+				if(counter>1) {
+					sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Vomitus", "הילד פלט היום מספר חריג של פעמים!");
+				value++;}
+				counter = 0;	
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return value;
+	}
 	
 	 // check the amount of water every child drink in the end of the day and the midlle of the day
-	int DailyWaterChack(Connection myConn, int time,String[] today,ResultSet kids) {
+	int DailyWaterCheck(Connection myConn, int time,String[] today,ResultSet kids) {
 		int value=0;
 		try {
 			String[] dateEvent,temp;
@@ -111,7 +141,7 @@ public class Asker {
 	}
 	
 	//check the amount of water every child drink in the pass coupl days(3)
-	int XDaysEgoWaterChack(Connection myConn,String[] today,ResultSet kids) { 
+	int XDaysEgoWaterCheck(Connection myConn,String[] today,ResultSet kids) { 
 		int value=0;
 		try {
 			String[] dateEvent,temp;
@@ -158,7 +188,7 @@ public class Asker {
 	
 	
 	//check the amount of food the every kid eat today
-	int DailyFoodChack(Connection myConn,String[] today,int time,ResultSet kids) {
+	int DailyFoodCheck(Connection myConn,String[] today,int time,ResultSet kids) {
 		int value=0;
 		try {
 			String[] dateEvent,temp;
@@ -236,7 +266,7 @@ public class Asker {
 	
 	
 	//check if the kid was" in the "toalet" today
-	int DailyDiaperChack(Connection myConn,String[] today,int time,ResultSet kids) {
+	int DailyDiaperCheck(Connection myConn,String[] today,int time,ResultSet kids) {
 		int value=0;
 		try {
 			String[] dateEvent,temp;
