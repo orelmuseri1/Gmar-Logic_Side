@@ -50,7 +50,7 @@ public class SendAllert {
 		conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
 		conn.setChunkedStreamingMode(0);
 		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		//System.out.println(object.toString());
+		System.out.println(object.toString());
 		wr.write(object.toString());
 		wr.flush();
 		StringBuilder sb = new StringBuilder();  

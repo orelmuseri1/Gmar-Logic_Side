@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.jar.JarException;
 
 
 
@@ -43,18 +42,20 @@ public class Asker {
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			}
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			countermsg += DailyVomitusCheck(myConn, WhatIsTheDate(), getKids(myConn));
+			countermsg += DailyVomitusCheck(myConn,1, WhatIsTheDate(), getKids(myConn));
 			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
 			countermsg += DailyWaterCheck(myConn,2,WhatIsTheDate(),getKids(myConn));
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
-			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun"))
+			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
 				countermsg += XDaysEgoWaterCheck(myConn,WhatIsTheDate(),getKids(myConn));
+				countermsg += DailyVomitusCheck(myConn,2, WhatIsTheDate(), getKids(myConn));
+			}
 			 }
 		return countermsg;
 		}
 	
 		//=====================================================================querys=====================================================================//
-	int DailyVomitusCheck(Connection myConn,String[] today,ResultSet kids) throws Exception {
+	int DailyVomitusCheck(Connection myConn,int time ,String[] today,ResultSet kids) throws Exception {
 		int value=0;
 		try {
 			String[] dateEvent,temp;
@@ -66,13 +67,27 @@ public class Asker {
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
+					if(time==1) {
 					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
-							counter++;
-						}
+						counter++;
+						}}
+					if(time==2) {
+					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
+						counter++;
+					}}
+				}if(time==1) {
+					if(counter==2) {
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"סביר","Vomitus", " הילד פלט/הקיא מספר חריג של פעמים");
+					value++;}
+					if(counter>2) {
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Vomitus", "סכנת התייבשות לתת לילד מים!");
+					value++;}
 				}
-				if(counter>1) {
-					sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Vomitus", "הילד פלט היום מספר חריג של פעמים!");
-				value++;}
+				if(time==2) {
+					if(counter>3) {
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Vomitus", "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ");
+					value++;}
+					}
 				counter = 0;	
 			}
 			
