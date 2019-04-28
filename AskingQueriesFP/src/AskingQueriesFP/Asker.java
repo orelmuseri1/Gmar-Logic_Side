@@ -36,8 +36,9 @@ public class Asker {
 		Connection myConn = null;
 		int countermsg = 0; //counting how match msg he send to the system in this run
 		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
+		sender.chackColorsAlerts(myConn,WhatIsTheDate());
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
+			countermsg += DailyDiaperCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			countermsg += DailyWaterCheck(myConn,1,WhatIsTheDate(),getKids(myConn)); 
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			}
@@ -49,7 +50,7 @@ public class Asker {
 			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
 				countermsg += XDaysEgoWaterCheck(myConn,WhatIsTheDate(),getKids(myConn));
 				countermsg += DailyVomitusCheck(myConn,2, WhatIsTheDate(), getKids(myConn));
-			}
+				}
 			 }
 		return countermsg;
 		}
