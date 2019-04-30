@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 
 public class SendAllert {
+	float counterEvents=0,statColors=0;
 	
 	int send(int ID,String Date,String Time,String Level,String EventsLeading,String Action) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
@@ -68,116 +69,12 @@ public class SendAllert {
 		
 	}
 	
-	
-	float chackColorsAlerts(Connection myConn,String[] date) throws Exception {
-		int color = 0;
-		float counter=0,stat=0;
-		ResultSet LiquidFoods=  getSet(myConn,"LiquidFood",date);
-		while(LiquidFoods.next()) {
-			color = 1;
-			counter++;
-			if(LiquidFoods.getString("consumedAmount").equals("לא אכל")) {
-				color = 3;
-				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("child"),color);
-				}
-			else if(LiquidFoods.getString("consumedAmount").equals("מתחת לחצי מנה")) {
-				color= 3;
-				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("child"),color);
-				}
-			else if(LiquidFoods.getString("consumedAmount").equals("מעלה לחצי מנה")) {
-				color= 2;
-				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("child"),color);
-				}
-			else if(LiquidFoods.getString("consumedAmount").equals("סיים מנה")) {
-				color= 1;
-				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("child"),color);
-				}
-			else if(LiquidFoods.getString("consumedAmount").equals("אכל מעבר למנה")) {
-				color= 2;
-				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("child"),color);
-				}
-			stat+=color;
-		}
-		
-		ResultSet Parasites=  getSet(myConn,"Parasites",date);
-		while(Parasites.next()) {
-			color = 1;
-			counter++;
-			if(Parasites.getString("type").equals("כינים")) {
-				color = 3;
-				//sendColorAlert(Parasites.getString("child"),Parasites.getString("child"),color);
-				}
-			else if(Parasites.getString("type").equals("תולעים")) {
-				color= 3;
-				//sendColorAlert(Parasites.getString("child"),Parasites.getString("child"),color);
-				}
-			stat+=color;
-		}
-		
-		
-		ResultSet Cough=  getSet(myConn,"Cough",date);
-		while(Cough.next()) {
-			color = 1;
-			counter++;
-			if(Cough.getString("type").equals("טורדני")) {
-				color = 3;
-				//sendColorAlert(Cough.getString("child"),Cough.getString("child"),color);
-				}
-			else if(Cough.getString("type").equals("לח")) {
-				color= 2;
-				//sendColorAlert(Cough.getString("child"),Cough.getString("child"),color);
-				}
-			stat+=color;
-		}
-		
-		ResultSet Feces=  getSet(myConn,"Feces",date);
-		while(Feces.next()) {
-			counter++;
-			color=1;
-			if(Feces.getString("texture").equals("רירי")) {
-				color = 3;
-				//sendColorAlert(Feces.getString("child"),Feces.getString("child"),color);
-				}
-			if(color==1) {
-				if(Feces.getString("color").equals("אדום/ורוד")) {
-					color= 3; // אלא אם הוא אכל מזונות אדומים למשל סלק
-					//sendColorAlert(Feces.getString("child"),Feces.getString("child"),color);
-					}
-				else if(Feces.getString("color").equals("אדום בוהק")) {
-					color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
-					//sendColorAlert(Feces.getString("child"),Feces.getString("child"),color);
-					}
-				else if(Feces.getString("color").equals("לבן אפור/חיוורת בצבע חימר")) {
-					color= 3;
-					//sendColorAlert(Feces.getString("child"),Feces.getString("child"),color);
-					}
-				else if(Feces.getString("color").equals("חום בהיר")) {
-					color= 2;
-					//sendColorAlert(Feces.getString("child"),Feces.getString("child"),color);
-					}
-			}
-			if(color==1) {
-				//sendColorAlert(Feces.getString("child"),Feces.getString("child"),color);
-			}
-			stat+=color;
-		}
-		
-		
-		return stat/counter;
-	}
-	
-	
-	
-	
-	
-	
-	
-	int sendColorAlert(String string,String table,int color) throws Exception{	
+	int sendColorAlert(String ID,String Table,int Color) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); 
 	    JSONObject object = new JSONObject();
-	    object.put("Color",String.valueOf(color));
-	    object.put("Table", table);
-	    object.put("ID", String.valueOf(string));
+	    object.put("Color",String.valueOf(Color));
+	    object.put("Table", Table);
+	    object.put("ID", String.valueOf(ID));
 	   
 	    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("POST");
@@ -210,9 +107,350 @@ public class SendAllert {
 	}
 	
 	
+	float chackColorsAlerts(Connection myConn,String[] date) throws Exception {
+		LiquidFoods(myConn,date);
+		Parasites(myConn,date);
+		Cough(myConn,date);
+		Feces(myConn,date);
+		Secretion(myConn,date);
+		SolidFood(myConn,date);
+		Vomitus(myConn,date);
+		Urine(myConn,date);				
+		Sleep(myConn,date);
+		
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ solution to get the date for event@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+		/*Vomitus.next();
+		String[] dateEvent,temp;
+		dateEvent = Vomitus.getString("eventDate").split("/");									//getting the date and the time of the event a
+		temp = dateEvent[2].toString().split(",");
+		dateEvent[2]=temp[0];
+		if(date[0].equals(dateEvent[0])&&date[1].equals(dateEvent[1])&& date[2].equals(dateEvent[2])) {
+			System.out.println("hi"+Vomitus.getString("type"));
+		}*/
+		
+		
+		if(counterEvents !=0.0)return statColors/counterEvents;
+		else return 0;
+	}
+	
+	
+	//======================================LiquidFoods===========================================//	
+	
+	
+	
+	
+	
+
+	
+	void LiquidFoods(Connection myConn,String[] date) throws Exception {
+		ResultSet LiquidFoods=  getSet(myConn,"LiquidFood",date);
+		int color = 1;
+		while(LiquidFoods.next()) {
+			if(LiquidFoods.getString("eventColor")==null) {
+				counterEvents++;
+				if(LiquidFoods.getString("consumedAmount").equals("לא אכל")) {
+					color = 3;
+					}
+				else if(LiquidFoods.getString("consumedAmount").equals("מתחת לחצי מנה")) {
+					color= 3;
+				}
+				else if(LiquidFoods.getString("consumedAmount").equals("מעלה לחצי מנה")) {
+					color= 2;
+				}
+				else if(LiquidFoods.getString("consumedAmount").equals("סיים מנה")) {
+					color= 1;
+				}
+				else if(LiquidFoods.getString("consumedAmount").equals("אכל מעבר למנה")) {
+					color= 2;
+				}
+				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+	
+	//=======================================Parasites============================================//
+	void Parasites(Connection myConn,String[] date) throws Exception {
+		ResultSet Parasites=  getSet(myConn,"Parasites",date);
+		int color=1;
+		while(Parasites.next()) {
+			if(Parasites.getString("eventColor")==null) {
+				color = 1;
+				counterEvents++;
+				if(Parasites.getString("type").equals("כינים")) {
+					color = 3;
+				}
+				else if(Parasites.getString("type").equals("תולעים")) {
+					color= 3;
+				}
+				//sendColorAlert(Parasites.getString("child"),Parasites.getString("eventType"),color);
+				statColors+=color;
+			}
+		}	
+	}
+	
+	//=========================================Cough==============================================//
+	void Cough(Connection myConn,String[] date) throws Exception {
+		int color =1;
+		ResultSet Cough =  getSet(myConn,"Cough",date);
+		while(Cough.next()) {
+			if(Cough.getString("eventColor")==null) {
+				color = 1;
+				counterEvents++;
+				if(Cough.getString("type").equals("טורדני")) {
+					color = 3;
+				}
+				else if(Cough.getString("type").equals("לח")) {
+					color= 2;
+				}
+				//sendColorAlert(Cough.getString("child"),Cough.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+	
+	//=========================================Feces==============================================//
+	void Feces(Connection myConn,String[] date) throws Exception {
+		int color =1;
+		ResultSet Feces=  getSet(myConn,"Feces",date);
+		while(Feces.next()) {
+			if(Feces.getString("eventColor")==null) {
+				counterEvents++;
+				color=1;
+				if(Feces.getString("texture").equals("רירי")) {
+					color = 3;
+				}
+				else if(Feces.getString("texture").equals("שילשול/מיימי ")) {
+					color = 2;
+				}
+				if(color!=3) {
+					if(Feces.getString("color").equals("אדום/ורוד")) {
+						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
+					}
+					else if(Feces.getString("color").equals("אדום בוהק")) {
+						color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
+					}
+					else if(Feces.getString("color").equals("לבן אפור/חיוורת בצבע חימר")) {
+						color= 3;
+					}
+					else if(Feces.getString("color").equals("חום בהיר")) {
+						color= 2;
+					}
+				}
+				if(color!=3) {
+					if(Feces.getString("amount").equals("ללא")) {
+						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
+					}
+					else if(Feces.getString("amount").equals("מריחה/כמות קטנה ")) {
+						color= 2; //אלא אם הוא אכל מזונות אדומים למשל סלק
+						}				
+				}
+				//sendColorAlert(Feces.getString("child"),Feces.getString("eventType"),color);
+				statColors+=color;
+			}
+		}	
+	}
+	
+	//========================================Secretion===========================================//
+	void Secretion(Connection myConn,String[] date) throws Exception {
+		int color = 1;
+		ResultSet Secretion=  getSet(myConn,"Secretion",date);
+		while(Secretion.next()) {
+			if(Secretion.getString("eventColor")==null) {
+				counterEvents++;
+				color=1;
+				if(Secretion.getString("type").equals("דם")) {
+					color = 3;
+				}
+				else if(Secretion.getString("type").equals("מוגלה")) {
+					color = 3;
+				}
+				else if(Secretion.getString("type").equals("נזלת")) {
+					color = 3;
+				}
+				//sendColorAlert(Secretion.getString("child"),Secretion.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+	
+	//========================================SolidFood===========================================//
+	void SolidFood(Connection myConn,String[] date) throws Exception {
+		int color =1;
+		ResultSet SolidFood=  getSet(myConn,"SolidFood",date);
+		while(SolidFood.next()) {
+			if(SolidFood.getString("eventColor")==null) {
+				color = 1;
+				counterEvents++;
+				if(SolidFood.getString("consumedAmount").equals("לא אכל")) {
+					color = 3;
+				}
+				else if(SolidFood.getString("consumedAmount").equals("מתחת לחצי מנה")) {
+					color= 3;
+				}
+				else if(SolidFood.getString("consumedAmount").equals("מעלה לחצי מנה")) {
+					color= 2;
+				}
+				else if(SolidFood.getString("consumedAmount").equals("סיים מנה")) {
+					color= 1;
+				}
+				else if(SolidFood.getString("consumedAmount").equals("אכל מעבר למנה")) {
+					color= 2;
+				}
+				//sendColorAlert(SolidFood.getString("child"),SolidFood.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+	
+	//=========================================Vomitus============================================//
+	void Vomitus(Connection myConn,String[] date) throws Exception {
+		int color = 1;
+		ResultSet Vomitus =  getSet(myConn,"Vomitus",date);
+		while(Vomitus.next()) {
+		 	if(Vomitus.getString("eventColor")==null) {
+			System.out.println(color);
+			color = 1;
+			counterEvents++;
+			if(Vomitus.getString("type").equals("הקאה")) {
+				color = 3;
+				}
+			else if(Vomitus.getString("type").equals("פליטה מוגברת")) {
+				color= 2;
+			}
+			//sendColorAlert(Vomitus.getString("child"),Vomitus.getString("eventType"),color);
+			statColors+=color;
+			}
+		}
+	}
+	
+	//==========================================Urine=============================================//
+	void Urine(Connection myConn,String[] date) throws Exception {
+		int color = 1;
+		ResultSet Urine=  getSet(myConn,"Urine",date);
+		while(Urine.next()) {
+			if(Urine.getString("eventColor")==null) {
+				counterEvents++;
+				color=1;
+				if(Urine.getString("color").equals("צהוב כהה עד חום בהיר")) {
+					color= 2; 
+				}
+				else if(Urine.getString("color").equals("אדום")) {
+					color= 3; 
+				}
+				if(color!=3) {
+					if(Urine.getString("fragrance").equals("חריף")) {
+						color= 3;
+					}
+				}
+				if(color!=3) {
+					if(Urine.getString("amount").equals("ללא")) {
+						color= 3; 
+					}
+					if(Urine.getString("amount").equals("מריחה/כמות קטנה ")) {
+						color= 2;
+					}	
+				}
+				//sendColorAlert(Urine.getString("child"),Urine.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+
+	//==========================================Sleep=============================================//
+	void Sleep(Connection myConn,String[] date) throws Exception {
+		int color = 1;
+		ResultSet Sleep=  getSet(myConn,"Sleep",date);
+		while(Sleep.next()) {
+			if(Sleep.getString("eventColor")==null) {
+				counterEvents++;
+				color=1;
+				if(Sleep.getString("sleepingScope").equals("אי שינה")) {
+					color= 3; 
+				}
+				else if(Sleep.getString("sleepingScope").equals("שינה חלקית לא שקטה")) {
+					color= 2; 
+				}
+				//sendColorAlert(Sleep.getString("child"),Sleep.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+	
+	//==========================================Fever=============================================//
+	void Fever(Connection myConn,String[] date) throws Exception{
+		int color = 1;
+		ResultSet Fever=  getSet(myConn,"Fever",date);
+		while(Fever.next()) {
+			if(Fever.getString("eventColor")==null) {
+				counterEvents++;
+				color=1;
+				if(Fever.getString("tempreture").equals("מתחת לטווח תקין")) {
+					color= 3; 
+				}
+				else if(Fever.getString("tempreture").equals("חום נמוך")) {
+					color= 2; 
+				}
+				else if(Fever.getString("tempreture").equals("מעל טווח תקין")) {
+					color= 3; 
+				}
+				//sendColorAlert(Fever.getString("child"),Fever.getString("eventType"),color);
+				statColors+=color;
+			}
+		}
+	}
+	
+	//==========================================Water=============================================//
+		void Water(Connection myConn,String[] date) throws Exception{
+			int color = 1;
+			ResultSet Water=  getSet(myConn,"Water",date);
+			while(Water.next()) {
+				if(Water.getString("eventColor")==null) {
+					counterEvents++;
+					color=1;
+					if(Water.getString("consumedAmount").equals("לא שתה")) {
+						color= 3; 
+					}
+					else if(Water.getString("consumedAmount").equals("שתה מתחת לחצי בקבוק")) {
+						color= 2; 
+					}
+					else if(Water.getString("consumedAmount").equals("שתה מעל חצי בקבוק")) {
+						color= 2; 
+					}
+					//sendColorAlert(Water.getString("child"),Water.getString("eventType"),color);
+					statColors+=color;
+				}
+			}
+		}
+	
+	//==========================================Disease=============================================//
+		void Disease(Connection myConn,String[] date) throws Exception{
+			ResultSet Disease=  getSet(myConn,"Disease",date);
+			while(Disease.next()) {
+				if(Disease.getString("eventColor")==null) {
+					counterEvents++;
+					//sendColorAlert(Disease.getString("child"),Disease.getString("eventType"),3);
+					statColors+=3;
+				}
+			}
+		}
+		
+	//==========================================Disease=============================================//
+		void Rash(Connection myConn,String[] date) throws Exception{
+			ResultSet Rash=  getSet(myConn,"Rash",date);
+			while(Rash.next()) {
+				if(Rash.getString("eventColor")==null) {
+					counterEvents++;
+					sendColorAlert(Rash.getString("child"),Rash.getString("eventType"),3);
+					statColors+=3;
+				}
+			}
+		}
+		
+		
 	ResultSet getSet(Connection myConn,String tableName,String[] date) throws SQLException {
 		Statement mystmt = myConn.createStatement();
-		String giveMeAllEvents= "SELECT * FROM "+tableName + "WHERE eventDate = "+date;
+		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE eventDate = "+date[0]+"/"+date[1]+"/"+date[2];
 		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
 		return events;
 	}
