@@ -72,7 +72,7 @@ public class SendAllert {
 	int sendColorAlert(String ID,String Table,int Color) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); 
 	    JSONObject object = new JSONObject();
-	    object.put("Color",String.valueOf(Color));
+	    object.put("Color",Color);
 	    object.put("Table", Table);
 	    object.put("ID", String.valueOf(ID));
 	   
@@ -107,16 +107,21 @@ public class SendAllert {
 	}
 	
 	
-	float chackColorsAlerts(Connection myConn,String[] date) throws Exception {
+	float checkColorsAlerts(Connection myConn,String[] date) throws Exception {
 		LiquidFoods(myConn,date);
 		Parasites(myConn,date);
 		Cough(myConn,date);
 		Feces(myConn,date);
 		Secretion(myConn,date);
 		SolidFood(myConn,date);
-		Vomitus(myConn,date);
+		Vomitus(myConn,date);          //didnt do check on general behavior, general note, and medication,
 		Urine(myConn,date);				
 		Sleep(myConn,date);
+		Fever(myConn,date);
+		Water(myConn,date);
+		Disease(myConn,date);
+		Rash(myConn,date);
+		
 		
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ solution to get the date for event@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 		/*Vomitus.next();
@@ -163,7 +168,7 @@ public class SendAllert {
 				else if(LiquidFoods.getString("consumedAmount").equals("אכל מעבר למנה")) {
 					color= 2;
 				}
-				//sendColorAlert(LiquidFoods.getString("child"),LiquidFoods.getString("eventType"),color);
+				//sendColorAlert(LiquidFoods.getString("eventId"),"LiquidFood",color);
 				statColors+=color;
 			}
 		}
@@ -183,7 +188,7 @@ public class SendAllert {
 				else if(Parasites.getString("type").equals("תולעים")) {
 					color= 3;
 				}
-				//sendColorAlert(Parasites.getString("child"),Parasites.getString("eventType"),color);
+				//sendColorAlert(Parasites.getString("eventId"),"Parasites",color);
 				statColors+=color;
 			}
 		}	
@@ -203,7 +208,7 @@ public class SendAllert {
 				else if(Cough.getString("type").equals("לח")) {
 					color= 2;
 				}
-				//sendColorAlert(Cough.getString("child"),Cough.getString("eventType"),color);
+				//sendColorAlert(Cough.getString("eventId"),"Cough",color);
 				statColors+=color;
 			}
 		}
@@ -245,7 +250,7 @@ public class SendAllert {
 						color= 2; //אלא אם הוא אכל מזונות אדומים למשל סלק
 						}				
 				}
-				//sendColorAlert(Feces.getString("child"),Feces.getString("eventType"),color);
+				//sendColorAlert(Feces.getString("eventId"),"Feces",color);
 				statColors+=color;
 			}
 		}	
@@ -268,7 +273,7 @@ public class SendAllert {
 				else if(Secretion.getString("type").equals("נזלת")) {
 					color = 3;
 				}
-				//sendColorAlert(Secretion.getString("child"),Secretion.getString("eventType"),color);
+				//sendColorAlert(Secretion.getString("eventId"),"Secretion",color);
 				statColors+=color;
 			}
 		}
@@ -297,7 +302,7 @@ public class SendAllert {
 				else if(SolidFood.getString("consumedAmount").equals("אכל מעבר למנה")) {
 					color= 2;
 				}
-				//sendColorAlert(SolidFood.getString("child"),SolidFood.getString("eventType"),color);
+				//sendColorAlert(SolidFood.getString("eventId"),"SolidFood",color);
 				statColors+=color;
 			}
 		}
@@ -318,7 +323,7 @@ public class SendAllert {
 			else if(Vomitus.getString("type").equals("פליטה מוגברת")) {
 				color= 2;
 			}
-			//sendColorAlert(Vomitus.getString("child"),Vomitus.getString("eventType"),color);
+			//sendColorAlert(Vomitus.getString("eventId"),"Vomitus",color);
 			statColors+=color;
 			}
 		}
@@ -351,7 +356,7 @@ public class SendAllert {
 						color= 2;
 					}	
 				}
-				//sendColorAlert(Urine.getString("child"),Urine.getString("eventType"),color);
+				//sendColorAlert(Urine.getString("eventId"),"Urine",color);
 				statColors+=color;
 			}
 		}
@@ -371,7 +376,7 @@ public class SendAllert {
 				else if(Sleep.getString("sleepingScope").equals("שינה חלקית לא שקטה")) {
 					color= 2; 
 				}
-				//sendColorAlert(Sleep.getString("child"),Sleep.getString("eventType"),color);
+				//sendColorAlert(Sleep.getString("eventId"),"Sleep",color);
 				statColors+=color;
 			}
 		}
@@ -394,7 +399,7 @@ public class SendAllert {
 				else if(Fever.getString("tempreture").equals("מעל טווח תקין")) {
 					color= 3; 
 				}
-				//sendColorAlert(Fever.getString("child"),Fever.getString("eventType"),color);
+				//sendColorAlert(Fever.getString("eventId"),"Fever",color);
 				statColors+=color;
 			}
 		}
@@ -417,7 +422,7 @@ public class SendAllert {
 					else if(Water.getString("consumedAmount").equals("שתה מעל חצי בקבוק")) {
 						color= 2; 
 					}
-					//sendColorAlert(Water.getString("child"),Water.getString("eventType"),color);
+					//sendColorAlert(Water.getString("eventId"),"Water",color);
 					statColors+=color;
 				}
 			}
@@ -429,7 +434,7 @@ public class SendAllert {
 			while(Disease.next()) {
 				if(Disease.getString("eventColor")==null) {
 					counterEvents++;
-					//sendColorAlert(Disease.getString("child"),Disease.getString("eventType"),3);
+					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
 					statColors+=3;
 				}
 			}
@@ -441,11 +446,14 @@ public class SendAllert {
 			while(Rash.next()) {
 				if(Rash.getString("eventColor")==null) {
 					counterEvents++;
-					sendColorAlert(Rash.getString("child"),Rash.getString("eventType"),3);
+					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
 					statColors+=3;
 				}
 			}
 		}
+		
+		
+		
 		
 		
 	ResultSet getSet(Connection myConn,String tableName,String[] date) throws SQLException {
