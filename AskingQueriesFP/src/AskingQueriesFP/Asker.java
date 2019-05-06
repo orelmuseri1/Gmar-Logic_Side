@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 
 public class Asker {
@@ -36,7 +39,7 @@ public class Asker {
 		Connection myConn = null;
 		int countermsg = 0; //counting how match msg he send to the system in this run
 		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
-		sender.checkColorsAlerts(myConn,WhatIsTheDate());
+		countermsg +=  sender.checkColorsAlerts(myConn,WhatIsTheDate());
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += DailyDiaperCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			countermsg += DailyWaterCheck(myConn,1,WhatIsTheDate(),getKids(myConn)); 
@@ -60,8 +63,9 @@ public class Asker {
 		int value=0;
 		try {
 			String[] dateEvent,temp;
-			int counter=0;
+			int counter=0,numOfEvents=1;
 			while(kids.next()) {															// pass all the kids 
+				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
 				ResultSet events= getSet(myConn, kids.getString("childID"), "Vomitus");
 				while(events.next()) {																		//pass all the events
@@ -69,27 +73,35 @@ public class Asker {
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
 					if(time==1) {
-					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
-						counter++;
-						}}
-					if(time==2) {
-					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
-						counter++;
-					}}
+						if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
+							object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+							numOfEvents++;
+							counter++;
+						}
+					}
+					else if(time==2) {
+						if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
+							object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+							numOfEvents++;
+							counter++;
+						}
+					}
+					
 				}if(time==1) {
 					if(counter==2) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"סביר","Vomitus", " הילד פלט/הקיא מספר חריג של פעמים");
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"סביר",object, " הילד פלט/הקיא מספר חריג של פעמים","Vomitus");
 					value++;}
 					if(counter>2) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Vomitus", "סכנת התייבשות לתת לילד מים!");
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "סכנת התייבשות לתת לילד מים!","Vomitus");
 					value++;}
 				}
-				if(time==2) {
+				else if(time==2) {
 					if(counter>3) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Vomitus", "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ");
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ","Vomitus");
 					value++;}
 					}
-				counter = 0;	
+				counter = 0;
+				numOfEvents=1;
 			}
 			
 		} catch (SQLException e) {
@@ -100,12 +112,13 @@ public class Asker {
 	}
 	
 	 // check the amount of water every child drink in the end of the day and the midlle of the day
-	int DailyWaterCheck(Connection myConn, int time,String[] today,ResultSet kids) {
-		int value=0;
+	int DailyWaterCheck(Connection myConn, int time,String[] today,ResultSet kids) throws Exception {
+		int value=0,numOfEvents=1;
 		try {
 			String[] dateEvent,temp;
 			int counterWater = 0;
 			while(kids.next()) {															// pass all the kids 
+				JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
 				ResultSet events= getSet(myConn, kids.getString("childID"), "Water");
 				while(events.next()) {																		//pass all the events
@@ -113,6 +126,8 @@ public class Asker {
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
 					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
+						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+						numOfEvents++;
 						//System.out.println(events.getString("child")+"-"+ events.getString("amount") + "-" + events.getString("consumedAmount") + "-" + events.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
 						if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
 							counterWater += events.getInt("amount");
@@ -127,26 +142,26 @@ public class Asker {
 				if(time == 1) {
 					if(counterWater<600) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Water", "הילד לא שתה מספיק מים היום!");
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "הילד לא שתה מספיק מים היום!","Water");
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} // the function that makes the alert
-					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mine everything ok
-						counterWater=0;
+					}
 				}
-				if(time == 2) {
+				else if(time == 2) {
 					if(counterWater<300) { 		// if he drink less than he actualy need in the half of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Water", "הילד לא שתה מספיק מים היום!");
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "הילד לא שתה מספיק מים היום!","Water");
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} // the function that makes the alert
-					}else System.out.println(kids.getString("firstName")+ " " + counterWater); // no need actuely to pay attention for else cuz its mine everything ok
+					}
 						counterWater=0;
+						numOfEvents=1;
 				}
 			}
 		} catch (SQLException e) {
@@ -157,13 +172,14 @@ public class Asker {
 	}
 	
 	//check the amount of water every child drink in the pass coupl days(3)
-	int XDaysEgoWaterCheck(Connection myConn,String[] today,ResultSet kids) { 
+	int XDaysEgoWaterCheck(Connection myConn,String[] today,ResultSet kids) throws Exception { 
 		int value=0;
 		try {
 			String[] dateEvent,temp;
-			int counterWater = 0;
+			int counterWater = 0,numOfEvents=1;
 
 			while(kids.next()) {																			// pass all the kids 
+				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid and his ID
 				ResultSet events=getSet(myConn, kids.getString("childID"), "Water");	
 				while(events.next()) {																		//pass all the events
@@ -172,6 +188,8 @@ public class Asker {
 					dateEvent[2]=temp[0];
 					
 					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) { //if the date of the event is what we looking for
+						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+						numOfEvents++;
 						if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
 							counterWater += events.getInt("amount");
 						else if(events.getString("consumedAmount").equals("more than half"))
@@ -184,7 +202,7 @@ public class Asker {
 				}
 					if(counterWater<1350) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Water", "הילד לא שותה מספיק מים !"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "הילד לא שותה מספיק מים !","Water"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -192,6 +210,7 @@ public class Asker {
 						} 
 					}
 					counterWater=0;
+					numOfEvents=1;
 			}
 			
 		} catch (SQLException e) {
@@ -203,16 +222,20 @@ public class Asker {
 	
 	
 	
+	
 	//check the amount of food the every kid eat today
-	int DailyFoodCheck(Connection myConn,String[] today,int time,ResultSet kids) {
-		int value=0;
+	int DailyFoodCheck(Connection myConn,String[] today,int time,ResultSet kids) throws Exception {
+		int value=0,numOfEvents=1;
 		try {
 			String[] dateEvent,temp;
 			float counterWater = 0;
 			while(kids.next()) {																				// pass each kid
+				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid
 				ResultSet events = getSet(myConn, kids.getString("childID"), "SolidFood");	
 				while(events.next()) {																			//pass all the events
+					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+					numOfEvents++;
 					dateEvent = events.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
@@ -231,6 +254,8 @@ public class Asker {
 				// need to know what is the real amout of food that need to count
 				ResultSet events2 =  getSet(myConn, kids.getString("childID"), "LiquidFood");		
 				while(events2.next()) {
+					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+					numOfEvents++;
 					dateEvent = events2.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
@@ -250,7 +275,7 @@ public class Asker {
 				if(time == 1) {
 					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Food","הילד לא אכל היום מספיק!"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -262,7 +287,7 @@ public class Asker {
 				if(time == 2) {
 					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Food","הילד לא אכל היום מספיק!"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -270,6 +295,7 @@ public class Asker {
 						}
 					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mean everything ok
 						counterWater=0;
+						numOfEvents=1;
 				}
 			}
 		} catch (SQLException e) {
@@ -278,16 +304,20 @@ public class Asker {
 		}
 		return value;
 	}
+	
+	
+	
 
 	
 	
 	//check if the kid was" in the "toalet" today
-	int DailyDiaperCheck(Connection myConn,String[] today,int time,ResultSet kids) {
-		int value=0;
+	int DailyDiaperCheck(Connection myConn,String[] today,int time,ResultSet kids) throws Exception {
+		int value=0,numOfEvents=1;
 		try {
 			String[] dateEvent,temp;
 			float counterWater = 0;
 			while(kids.next()) {																				// pass each kid
+				JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid											//creating statement
 				ResultSet events = getSet(myConn, kids.getString("childID"), "Urine");	
 				while(events.next()) {																			//pass all the events
@@ -295,7 +325,8 @@ public class Asker {
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
 					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
-						//System.out.println(events.getString("child")+ "-" + events.getString("amount") + "-" + events.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
+						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+						numOfEvents++;
 						if(events.getString("amount").equals("חיתול מלא"))	{								//checking the amount he drink and sum the amount he drink all day
 							counterWater += 1;}
 						else if(events.getString("amount").equals("כמות רגילה")) {
@@ -309,11 +340,13 @@ public class Asker {
 				// need to know what is the real amout of food that need to count
 				ResultSet events2 =getSet(myConn, kids.getString("childID"), "Feces");						//execute the query
 				while(events2.next()) {
+					
 					dateEvent = events2.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
 					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) {  //if the date of the event is today
-						//System.out.println(events2.getString("child")+ "-" + events2.getString("amount") + "-" + events2.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
+						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+						numOfEvents++;
 						if(events2.getString("amount").equals("חיתול מלא")) {									//checking the amount he drink and sum the amount he drink all day
 							counterWater += 1;}
 						else if(events2.getString("amount").equals("כמות רגילה")) {
@@ -328,24 +361,26 @@ public class Asker {
 				if(time == 1) {
 					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Feces/Urine","כמות הצואה/שתן קטנה"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}counterWater=0;
+					}
 				}else if(time == 2) {
 					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין","Feces/Urine","הילד לא אכל היום מספיק!"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}counterWater=0;
+					}
 				}
+				counterWater=0;
+				numOfEvents=1;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

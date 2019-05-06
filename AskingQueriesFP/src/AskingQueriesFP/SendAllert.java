@@ -16,22 +16,11 @@ import org.json.JSONObject;
 public class SendAllert {
 	float counterEvents=0,statColors=0;
 	
-	int send(int ID,String Date,String Time,String Level,String EventsLeading,String Action) throws Exception{	
+	int send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String Table) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
-		/*Map<String,String> params = new LinkedHashMap<String,String>();
-	    params.put("\"Date\"", addB(Date));
-	    params.put("\"Time\"", addB(Time));
-	    params.put("\"Child id\"",String.valueOf(ID));
-	    params.put("\"Level\"", addB(Level));
-	    params.put("\"Events leading\"", addB(EventsLeading));
-	    params.put("\"Action needed\"", addB(Action));
-	    String JsonToString =params.toString();
-	    JsonToString=JsonToString.replaceAll("=", ":");
-	    System.out.println(JsonToString);*/
-		
 	    JSONObject object = new JSONObject();
-	    object.put("Date", Date);
-	    object.put("Time", Time);
+	    object.put("EventDate", Date);
+	    object.put("EventTime", Time);
 	    object.put("Child id",String.valueOf(ID));
 	    object.put("Level", Level);
 	    object.put("Events leading", EventsLeading);
@@ -69,6 +58,7 @@ public class SendAllert {
 		
 	}
 	
+	// sent alert thet event color change in table and give the ID of the event that cange for the client
 	int sendColorAlert(String ID,String Table,int Color) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); 
 	    JSONObject object = new JSONObject();
@@ -105,6 +95,39 @@ public class SendAllert {
 				}
 		return 0;
 	}
+
+	// sent put that Cange the alert color
+	int sendPutColor(String ID, JSONObject object,String table) throws Exception{	
+			URL	url = new URL("http://127.0.0.1:5000/events/"+table+"/"+ID); 
+		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.setRequestMethod("PUT");
+			conn.setRequestProperty("Content-Type", "application/json; charsets=UTF_8");
+			conn.setRequestProperty("Content-Length", String.valueOf(object.length()));
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
+			conn.setChunkedStreamingMode(0);
+			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+			System.out.println(object.toString());
+			wr.write(object.toString());
+			wr.flush();
+			StringBuilder sb = new StringBuilder();  
+			int HttpResult = conn.getResponseCode(); 
+			if (HttpResult == HttpURLConnection.HTTP_OK) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+				String line = null;  
+				while ((line = br.readLine()) != null) {  
+					  sb.append(line);  
+					  }
+				br.close();
+
+				JSONObject myResponse = new JSONObject(sb.toString());
+				System.out.println(myResponse);
+					} else {
+					    System.out.println(conn.getResponseMessage());  
+					}
+			return 0;
+		}
 	
 	
 	float checkColorsAlerts(Connection myConn,String[] date) throws Exception {
@@ -121,19 +144,6 @@ public class SendAllert {
 		Water(myConn,date);
 		Disease(myConn,date);
 		Rash(myConn,date);
-		
-		
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ solution to get the date for event@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-		/*Vomitus.next();
-		String[] dateEvent,temp;
-		dateEvent = Vomitus.getString("eventDate").split("/");									//getting the date and the time of the event a
-		temp = dateEvent[2].toString().split(",");
-		dateEvent[2]=temp[0];
-		if(date[0].equals(dateEvent[0])&&date[1].equals(dateEvent[1])&& date[2].equals(dateEvent[2])) {
-			System.out.println("hi"+Vomitus.getString("type"));
-		}*/
-		
-		
 		if(counterEvents !=0.0)return statColors/counterEvents;
 		else return 0;
 	}
@@ -149,9 +159,9 @@ public class SendAllert {
 	
 	void LiquidFoods(Connection myConn,String[] date) throws Exception {
 		ResultSet LiquidFoods=  getSet(myConn,"LiquidFood",date);
-		int color = 1;
 		while(LiquidFoods.next()) {
-			if(LiquidFoods.getString("eventColor")==null) {
+			int color = 1;
+			if(LiquidFoods.getString("level")==null) {
 				counterEvents++;
 				if(LiquidFoods.getString("consumedAmount").equals("לא אכל")) {
 					color = 3;
@@ -169,6 +179,17 @@ public class SendAllert {
 					color= 2;
 				}
 				//sendColorAlert(LiquidFoods.getString("eventId"),"LiquidFood",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",LiquidFoods.getString("eventDate"));
+			    object.put("eventTime",LiquidFoods.getString("eventTime"));
+			    object.put("childID",LiquidFoods.getString("childID"));
+			    object.put("staffID",LiquidFoods.getString("staffID"));
+			    object.put("amount",LiquidFoods.getString("amount"));
+			    object.put("consumedAmount",LiquidFoods.getString("consumedAmount"));
+			    object.put("mealType",LiquidFoods.getString("mealType"));
+			    object.put("eventId", String.valueOf(LiquidFoods.getString("eventId")));
+				sendPutColor(LiquidFoods.getString("eventId"),object,"LiquidFoodEvent");
 				statColors+=color;
 			}
 		}
@@ -179,7 +200,7 @@ public class SendAllert {
 		ResultSet Parasites=  getSet(myConn,"Parasites",date);
 		int color=1;
 		while(Parasites.next()) {
-			if(Parasites.getString("eventColor")==null) {
+			if(Parasites.getString("level")==null) {
 				color = 1;
 				counterEvents++;
 				if(Parasites.getString("type").equals("כינים")) {
@@ -189,6 +210,15 @@ public class SendAllert {
 					color= 3;
 				}
 				//sendColorAlert(Parasites.getString("eventId"),"Parasites",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Parasites.getString("eventDate"));
+			    object.put("eventTime",Parasites.getString("eventTime"));
+			    object.put("childID",Parasites.getString("childID"));
+			    object.put("staffID",Parasites.getString("staffID"));
+			    object.put("type",Parasites.getString("type"));
+			    object.put("eventId", String.valueOf(Parasites.getString("eventId")));
+				sendPutColor(Parasites.getString("eventId"),object,"ParasitesEvent");
 				statColors+=color;
 			}
 		}	
@@ -199,7 +229,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet Cough =  getSet(myConn,"Cough",date);
 		while(Cough.next()) {
-			if(Cough.getString("eventColor")==null) {
+			if(Cough.getString("level")==null) {
 				color = 1;
 				counterEvents++;
 				if(Cough.getString("type").equals("טורדני")) {
@@ -209,6 +239,15 @@ public class SendAllert {
 					color= 2;
 				}
 				//sendColorAlert(Cough.getString("eventId"),"Cough",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Cough.getString("eventDate"));
+			    object.put("eventTime",Cough.getString("eventTime"));
+			    object.put("childID",Cough.getString("childID"));
+			    object.put("staffID",Cough.getString("staffID"));
+			    object.put("type",Cough.getString("type"));
+			    object.put("eventId", String.valueOf(Cough.getString("eventId")));
+				sendPutColor(Cough.getString("eventId"),object,"CoughEvent");
 				statColors+=color;
 			}
 		}
@@ -219,7 +258,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet Feces=  getSet(myConn,"Feces",date);
 		while(Feces.next()) {
-			if(Feces.getString("eventColor")==null) {
+			if(Feces.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Feces.getString("texture").equals("רירי")) {
@@ -251,6 +290,17 @@ public class SendAllert {
 						}				
 				}
 				//sendColorAlert(Feces.getString("eventId"),"Feces",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Feces.getString("eventDate"));
+			    object.put("eventTime",Feces.getString("eventTime"));
+			    object.put("childID",Feces.getString("childID"));
+			    object.put("staffID",Feces.getString("staffID"));
+			    object.put("amount",Feces.getString("amount"));
+			    object.put("color",Feces.getString("color"));
+			    object.put("texture",Feces.getString("texture"));
+			    object.put("eventId", String.valueOf(Feces.getString("eventId")));
+				sendPutColor(Feces.getString("eventId"),object,"FecesEvent");
 				statColors+=color;
 			}
 		}	
@@ -261,7 +311,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Secretion=  getSet(myConn,"Secretion",date);
 		while(Secretion.next()) {
-			if(Secretion.getString("eventColor")==null) {
+			if(Secretion.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Secretion.getString("type").equals("דם")) {
@@ -274,6 +324,17 @@ public class SendAllert {
 					color = 3;
 				}
 				//sendColorAlert(Secretion.getString("eventId"),"Secretion",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Secretion.getString("eventDate"));
+			    object.put("eventTime",Secretion.getString("eventTime"));
+			    object.put("childID",Secretion.getString("childID"));
+			    object.put("staffID",Secretion.getString("staffID"));
+			    object.put("rank",Secretion.getString("rank"));
+			    object.put("area",Secretion.getString("area"));
+			    object.put("type",Secretion.getString("type"));
+			    object.put("eventId", String.valueOf(Secretion.getString("eventId")));
+				sendPutColor(Secretion.getString("eventId"),object,"SecretionEvent");
 				statColors+=color;
 			}
 		}
@@ -284,7 +345,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet SolidFood=  getSet(myConn,"SolidFood",date);
 		while(SolidFood.next()) {
-			if(SolidFood.getString("eventColor")==null) {
+			if(SolidFood.getString("level")==null) {
 				color = 1;
 				counterEvents++;
 				if(SolidFood.getString("consumedAmount").equals("לא אכל")) {
@@ -303,6 +364,18 @@ public class SendAllert {
 					color= 2;
 				}
 				//sendColorAlert(SolidFood.getString("eventId"),"SolidFood",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",SolidFood.getString("eventDate"));
+			    object.put("eventTime",SolidFood.getString("eventTime"));
+			    object.put("childID",SolidFood.getString("childID"));
+			    object.put("staffID",SolidFood.getString("staffID"));
+			    object.put("amount",SolidFood.getString("amount"));
+			    object.put("consumedAmount",SolidFood.getString("consumedAmount"));
+			    object.put("mealInMenu",SolidFood.getString("mealInMenu"));
+			    object.put("mealType",SolidFood.getString("mealType"));
+			    object.put("eventId", String.valueOf(SolidFood.getString("eventId")));
+				sendPutColor(SolidFood.getString("eventId"),object,"SolidFoodEvent");
 				statColors+=color;
 			}
 		}
@@ -313,7 +386,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Vomitus =  getSet(myConn,"Vomitus",date);
 		while(Vomitus.next()) {
-		 	if(Vomitus.getString("eventColor")==null) {
+		 	if(Vomitus.getString("level")==null) {
 			System.out.println(color);
 			color = 1;
 			counterEvents++;
@@ -324,6 +397,15 @@ public class SendAllert {
 				color= 2;
 			}
 			//sendColorAlert(Vomitus.getString("eventId"),"Vomitus",color);
+			JSONObject object = new JSONObject();
+		    object.put("level",color);
+		    object.put("eventDate",Vomitus.getString("eventDate"));
+		    object.put("eventTime",Vomitus.getString("eventTime"));
+		    object.put("childID",Vomitus.getString("childID"));
+		    object.put("staffID",Vomitus.getString("staffID"));
+		    object.put("proper",Vomitus.getString("proper"));
+		    object.put("eventId", String.valueOf(Vomitus.getString("eventId")));
+			sendPutColor(Vomitus.getString("eventId"),object,"VomitusEvent");
 			statColors+=color;
 			}
 		}
@@ -334,7 +416,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Urine=  getSet(myConn,"Urine",date);
 		while(Urine.next()) {
-			if(Urine.getString("eventColor")==null) {
+			if(Urine.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Urine.getString("color").equals("צהוב כהה עד חום בהיר")) {
@@ -357,6 +439,17 @@ public class SendAllert {
 					}	
 				}
 				//sendColorAlert(Urine.getString("eventId"),"Urine",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Urine.getString("eventDate"));
+			    object.put("eventTime",Urine.getString("eventTime"));
+			    object.put("childID",Urine.getString("childID"));
+			    object.put("staffID",Urine.getString("staffID"));
+			    object.put("amount",Urine.getString("amount"));
+			    object.put("color",Urine.getString("color"));
+			    object.put("fragrance",Urine.getString("fragrance"));
+			    object.put("eventId", String.valueOf(Urine.getString("eventId")));
+				sendPutColor(Urine.getString("eventId"),object,"UrineEvent");
 				statColors+=color;
 			}
 		}
@@ -367,7 +460,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Sleep=  getSet(myConn,"Sleep",date);
 		while(Sleep.next()) {
-			if(Sleep.getString("eventColor")==null) {
+			if(Sleep.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Sleep.getString("sleepingScope").equals("אי שינה")) {
@@ -377,6 +470,17 @@ public class SendAllert {
 					color= 2; 
 				}
 				//sendColorAlert(Sleep.getString("eventId"),"Sleep",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Sleep.getString("eventDate"));
+			    object.put("eventTime",Sleep.getString("eventTime"));
+			    object.put("childID",Sleep.getString("childID"));
+			    object.put("staffID",Sleep.getString("staffID"));
+			    object.put("allocatedTime",Sleep.getString("allocatedTime"));
+			    object.put("sleepingScope",Sleep.getString("sleepingScope"));
+			    object.put("type",Sleep.getString("type"));
+			    object.put("eventId", String.valueOf(Sleep.getString("eventId")));
+				sendPutColor(Sleep.getString("eventId"),object,"SleepEvent");
 				statColors+=color;
 			}
 		}
@@ -387,7 +491,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Fever=  getSet(myConn,"Fever",date);
 		while(Fever.next()) {
-			if(Fever.getString("eventColor")==null) {
+			if(Fever.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Fever.getString("tempreture").equals("מתחת לטווח תקין")) {
@@ -400,6 +504,15 @@ public class SendAllert {
 					color= 3; 
 				}
 				//sendColorAlert(Fever.getString("eventId"),"Fever",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",Fever.getString("eventDate"));
+			    object.put("eventTime",Fever.getString("eventTime"));
+			    object.put("childID",Fever.getString("childID"));
+			    object.put("staffID",Fever.getString("staffID"));
+			    object.put("tempreture",Fever.getString("tempreture"));
+			    object.put("eventId", String.valueOf(Fever.getString("eventId")));
+				sendPutColor(Fever.getString("eventId"),object,"FeverEvent");
 				statColors+=color;
 			}
 		}
@@ -410,7 +523,7 @@ public class SendAllert {
 			int color = 1;
 			ResultSet Water=  getSet(myConn,"Water",date);
 			while(Water.next()) {
-				if(Water.getString("eventColor")==null) {
+				if(Water.getString("level")==null) {
 					counterEvents++;
 					color=1;
 					if(Water.getString("consumedAmount").equals("לא שתה")) {
@@ -423,6 +536,16 @@ public class SendAllert {
 						color= 2; 
 					}
 					//sendColorAlert(Water.getString("eventId"),"Water",color);
+					JSONObject object = new JSONObject();
+				    object.put("level",color);
+				    object.put("eventDate",Water.getString("eventDate"));
+				    object.put("eventTime",Water.getString("eventTime"));
+				    object.put("childID",Water.getString("childID"));
+				    object.put("staffID",Water.getString("staffID"));
+				    object.put("amount",Water.getString("amount"));
+				    object.put("consumedAmount",Water.getString("consumedAmount"));
+				    object.put("eventId", String.valueOf(Water.getString("eventId")));
+					sendPutColor(Water.getString("eventId"),object,"WaterEvent");
 					statColors+=color;
 				}
 			}
@@ -432,9 +555,19 @@ public class SendAllert {
 		void Disease(Connection myConn,String[] date) throws Exception{
 			ResultSet Disease=  getSet(myConn,"Disease",date);
 			while(Disease.next()) {
-				if(Disease.getString("eventColor")==null) {
+				if(Disease.getString("level")==null) {
 					counterEvents++;
 					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
+					JSONObject object = new JSONObject();
+				    object.put("level",String.valueOf(3));
+				    object.put("eventDate",Disease.getString("eventDate"));
+				    object.put("eventTime",Disease.getString("eventTime"));
+				    object.put("childID",Disease.getString("childID"));
+				    object.put("staffID",Disease.getString("staffID"));
+				    object.put("details",Disease.getString("details"));
+				    object.put("type",Disease.getString("type"));
+				    object.put("eventId", String.valueOf(Disease.getString("eventId")));
+					sendPutColor(Disease.getString("eventId"),object,"DiseaseEvent");
 					statColors+=3;
 				}
 			}
@@ -444,9 +577,19 @@ public class SendAllert {
 		void Rash(Connection myConn,String[] date) throws Exception{
 			ResultSet Rash=  getSet(myConn,"Rash",date);
 			while(Rash.next()) {
-				if(Rash.getString("eventColor")==null) {
+				if(Rash.getString("level")==null) {
 					counterEvents++;
 					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
+					JSONObject object = new JSONObject();
+				    object.put("level",String.valueOf(3));
+				    object.put("eventDate",Rash.getString("eventDate"));
+				    object.put("eventTime",Rash.getString("eventTime"));
+				    object.put("childID",Rash.getString("childID"));
+				    object.put("staffID",Rash.getString("staffID"));
+				    object.put("area",Rash.getString("area"));
+				    object.put("type",Rash.getString("type"));
+				    object.put("eventId", String.valueOf(Rash.getString("eventId")));
+					sendPutColor(Rash.getString("eventId"),object,"RashEvent");
 					statColors+=3;
 				}
 			}
@@ -458,7 +601,8 @@ public class SendAllert {
 		
 	ResultSet getSet(Connection myConn,String tableName,String[] date) throws SQLException {
 		Statement mystmt = myConn.createStatement();
-		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE eventDate = "+date[0]+"/"+date[1]+"/"+date[2];
+		//System.out.println("SELECT * FROM "+tableName+" WHERE eventDate = "+date[0]+"/"+date[1]+"/"+date[2]);
+		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE eventDate = " +"\""+date[0]+"/"+date[1]+"/"+date[2]+"\"";
 		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
 		return events;
 	}
