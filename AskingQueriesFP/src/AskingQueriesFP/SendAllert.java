@@ -149,19 +149,12 @@ public class SendAllert {
 	}
 	
 	
-	//======================================LiquidFoods===========================================//	
-	
-	
-	
-	
-	
-
-	
+	//======================================LiquidFoods===========================================//		
 	void LiquidFoods(Connection myConn,String[] date) throws Exception {
 		ResultSet LiquidFoods=  getSet(myConn,"LiquidFood",date);
 		while(LiquidFoods.next()) {
 			int color = 1;
-			if(LiquidFoods.getString("level")==null) {
+			if(LiquidFoods.getString("level")=="null") {
 				counterEvents++;
 				if(LiquidFoods.getString("consumedAmount").equals("לא אכל")) {
 					color = 3;
@@ -200,7 +193,7 @@ public class SendAllert {
 		ResultSet Parasites=  getSet(myConn,"Parasites",date);
 		int color=1;
 		while(Parasites.next()) {
-			if(Parasites.getString("level")==null) {
+			if(Parasites.getString("level")=="null") {
 				color = 1;
 				counterEvents++;
 				if(Parasites.getString("type").equals("כינים")) {
@@ -229,7 +222,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet Cough =  getSet(myConn,"Cough",date);
 		while(Cough.next()) {
-			if(Cough.getString("level")==null) {
+			if(Cough.getString("level")=="null") {
 				color = 1;
 				counterEvents++;
 				if(Cough.getString("type").equals("טורדני")) {
@@ -258,7 +251,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet Feces=  getSet(myConn,"Feces",date);
 		while(Feces.next()) {
-			if(Feces.getString("level")==null) {
+			if(Feces.getString("level")=="null") {
 				counterEvents++;
 				color=1;
 				if(Feces.getString("texture").equals("רירי")) {
@@ -311,7 +304,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Secretion=  getSet(myConn,"Secretion",date);
 		while(Secretion.next()) {
-			if(Secretion.getString("level")==null) {
+			if(Secretion.getString("level")=="null") {
 				counterEvents++;
 				color=1;
 				if(Secretion.getString("type").equals("דם")) {
@@ -345,7 +338,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet SolidFood=  getSet(myConn,"SolidFood",date);
 		while(SolidFood.next()) {
-			if(SolidFood.getString("level")==null) {
+			if(SolidFood.getString("level")=="null") {
 				color = 1;
 				counterEvents++;
 				if(SolidFood.getString("consumedAmount").equals("לא אכל")) {
@@ -386,7 +379,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Vomitus =  getSet(myConn,"Vomitus",date);
 		while(Vomitus.next()) {
-		 	if(Vomitus.getString("level")==null) {
+		 	if(Vomitus.getString("level")=="null") {
 			System.out.println(color);
 			color = 1;
 			counterEvents++;
@@ -416,7 +409,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Urine=  getSet(myConn,"Urine",date);
 		while(Urine.next()) {
-			if(Urine.getString("level")==null) {
+			if(Urine.getString("level")=="null") {
 				counterEvents++;
 				color=1;
 				if(Urine.getString("color").equals("צהוב כהה עד חום בהיר")) {
@@ -460,7 +453,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Sleep=  getSet(myConn,"Sleep",date);
 		while(Sleep.next()) {
-			if(Sleep.getString("level")==null) {
+			if(Sleep.getString("level")=="null") {
 				counterEvents++;
 				color=1;
 				if(Sleep.getString("sleepingScope").equals("אי שינה")) {
@@ -491,7 +484,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Fever=  getSet(myConn,"Fever",date);
 		while(Fever.next()) {
-			if(Fever.getString("level")==null) {
+			if(Fever.getString("level")=="null") {
 				counterEvents++;
 				color=1;
 				if(Fever.getString("tempreture").equals("מתחת לטווח תקין")) {
@@ -523,16 +516,16 @@ public class SendAllert {
 			int color = 1;
 			ResultSet Water=  getSet(myConn,"Water",date);
 			while(Water.next()) {
-				if(Water.getString("level")==null) {
+				if(Water.getString("level")=="null") {
 					counterEvents++;
 					color=1;
 					if(Water.getString("consumedAmount").equals("לא שתה")) {
 						color= 3; 
 					}
-					else if(Water.getString("consumedAmount").equals("שתה מתחת לחצי בקבוק")) {
+					else if(Water.getString("consumedAmount").equals("מתחת לחצי בקבוק")) {
 						color= 2; 
 					}
-					else if(Water.getString("consumedAmount").equals("שתה מעל חצי בקבוק")) {
+					else if(Water.getString("consumedAmount").equals("מעל חצי בקבוק")) {
 						color= 2; 
 					}
 					//sendColorAlert(Water.getString("eventId"),"Water",color);
@@ -555,7 +548,7 @@ public class SendAllert {
 		void Disease(Connection myConn,String[] date) throws Exception{
 			ResultSet Disease=  getSet(myConn,"Disease",date);
 			while(Disease.next()) {
-				if(Disease.getString("level")==null) {
+				if(Disease.getString("level")=="null") {
 					counterEvents++;
 					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
 					JSONObject object = new JSONObject();
@@ -577,7 +570,7 @@ public class SendAllert {
 		void Rash(Connection myConn,String[] date) throws Exception{
 			ResultSet Rash=  getSet(myConn,"Rash",date);
 			while(Rash.next()) {
-				if(Rash.getString("level")==null) {
+				if(Rash.getString("level")=="null") {
 					counterEvents++;
 					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
 					JSONObject object = new JSONObject();

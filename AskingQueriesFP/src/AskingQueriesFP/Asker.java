@@ -58,7 +58,7 @@ public class Asker {
 		return countermsg;
 		}
 	
-		//=====================================================================querys=====================================================================//
+	//=====================================================================querys=====================================================================//
 	int DailyVomitusCheck(Connection myConn,int time ,String[] today,ResultSet kids) throws Exception {
 		int value=0;
 		try {
@@ -67,25 +67,21 @@ public class Asker {
 			while(kids.next()) {															// pass all the kids 
 				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
-				ResultSet events= getSet(myConn, kids.getString("childID"), "Vomitus");
+				ResultSet events= getSet(myConn, kids.getString("childID"), "Vomitus",WhatIsTheDate());
 				while(events.next()) {																		//pass all the events
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
 					if(time==1) {
-						if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
-							object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-							numOfEvents++;
-							counter++;
-						}
+						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+						numOfEvents++;
+						counter++;
 					}
 					else if(time==2) {
-						if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
-							object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-							numOfEvents++;
-							counter++;
+						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+						numOfEvents++;
+						counter++;
 						}
-					}
 					
 				}if(time==1) {
 					if(counter==2) {
@@ -120,13 +116,12 @@ public class Asker {
 			while(kids.next()) {															// pass all the kids 
 				JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
-				ResultSet events= getSet(myConn, kids.getString("childID"), "Water");
+				ResultSet events= getSet(myConn, kids.getString("childID"), "Water",WhatIsTheDate());
 				while(events.next()) {																		//pass all the events
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
-					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
-						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
 						numOfEvents++;
 						//System.out.println(events.getString("child")+"-"+ events.getString("amount") + "-" + events.getString("consumedAmount") + "-" + events.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
 						if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
@@ -137,7 +132,6 @@ public class Asker {
 							counterWater += 0.4*events.getInt("amount");
 						else if(events.getString("consumedAmount").equals("nothing"))
 							counterWater += 0*events.getInt("amount");
-					}
 				}
 				if(time == 1) {
 					if(counterWater<600) { 		// if he drink less than he actualy need near to the end of the day
@@ -181,24 +175,21 @@ public class Asker {
 			while(kids.next()) {																			// pass all the kids 
 				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid and his ID
-				ResultSet events=getSet(myConn, kids.getString("childID"), "Water");	
+				ResultSet events=getSet(myConn, kids.getString("childID"), "Water",WhatIsTheDate());	
 				while(events.next()) {																		//pass all the events
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
-					
-					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) { //if the date of the event is what we looking for
-						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-						numOfEvents++;
-						if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
-							counterWater += events.getInt("amount");
-						else if(events.getString("consumedAmount").equals("more than half"))
-							counterWater += 0.6*events.getInt("amount");
-						else if(events.getString("consumedAmount").equals("less than half"))
-							counterWater += 0.4*events.getInt("amount");
-						else if(events.getString("consumedAmount").equals("nothing"))
-							counterWater += 0*events.getInt("amount");
-					}
+					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+					numOfEvents++;
+					if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
+						counterWater += events.getInt("amount");
+					else if(events.getString("consumedAmount").equals("more than half"))
+						counterWater += 0.6*events.getInt("amount");
+					else if(events.getString("consumedAmount").equals("less than half"))
+						counterWater += 0.4*events.getInt("amount");
+					else if(events.getString("consumedAmount").equals("nothing"))
+						counterWater += 0*events.getInt("amount");
 				}
 					if(counterWater<1350) { 		// if he drink less than he actualy need near to the end of the day
 						try {
@@ -232,27 +223,24 @@ public class Asker {
 			while(kids.next()) {																				// pass each kid
 				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid
-				ResultSet events = getSet(myConn, kids.getString("childID"), "SolidFood");	
+				ResultSet events = getSet(myConn, kids.getString("childID"), "SolidFood",WhatIsTheDate());	
 				while(events.next()) {																			//pass all the events
 					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
 					numOfEvents++;
 					dateEvent = events.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
-					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) { //if the date of the event is today
-						System.out.println(events.getString("consumedAmount")); //print the id of the kid the amount of water he get and the amount he actualy drink
-						if(events.getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
+				if(events.getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
 							counterWater += 1;}
 						else if(events.getString("consumedAmount").equals("more than half")) {
 							counterWater += 0.6;}
 						else if(events.getString("consumedAmount").equals("less than half")) {
 							counterWater += 0.4;}
 						else if(events.getString("consumedAmount").equals("nothing")) {
-							counterWater += 0;}
-					}					
+							counterWater += 0;}					
 				}
 				// need to know what is the real amout of food that need to count
-				ResultSet events2 =  getSet(myConn, kids.getString("childID"), "LiquidFood");		
+				ResultSet events2 =  getSet(myConn, kids.getString("childID"), "LiquidFood",WhatIsTheDate());		
 				while(events2.next()) {
 					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
 					numOfEvents++;
@@ -319,7 +307,7 @@ public class Asker {
 			while(kids.next()) {																				// pass each kid
 				JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid											//creating statement
-				ResultSet events = getSet(myConn, kids.getString("childID"), "Urine");	
+				ResultSet events = getSet(myConn, kids.getString("childID"), "Urine",WhatIsTheDate());	
 				while(events.next()) {																			//pass all the events
 					dateEvent = events.getString("eventDate").split("/");										//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
@@ -338,7 +326,7 @@ public class Asker {
 					}					
 				}
 				// need to know what is the real amout of food that need to count
-				ResultSet events2 =getSet(myConn, kids.getString("childID"), "Feces");						//execute the query
+				ResultSet events2 =getSet(myConn, kids.getString("childID"), "Feces",WhatIsTheDate());						//execute the query
 				while(events2.next()) {
 					
 					dateEvent = events2.getString("eventDate").split("/");										//getting the date and the time of the event a
@@ -391,6 +379,8 @@ public class Asker {
 	
 	
 	//================================================================using function====================================================================//
+	
+	
 	
 	//function that get time of start and the end and check if now is between  them
 	boolean checkTime(int starthour,int startmin,int finishhour,int finishmin) { 
@@ -445,9 +435,9 @@ public class Asker {
 	}
 	
 	
-	ResultSet getSet(Connection myConn,String kid,String tableName) throws SQLException {
+	ResultSet getSet(Connection myConn,String kid,String tableName,String[] date) throws SQLException {
 		Statement mystmt = myConn.createStatement();
-		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE child = "+kid;
+		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE (childID = "+kid + " AND eventDate ="  + "\""+date[0]+"/"+date[1]+"/"+date[2]+"\")";
 		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
 		return events;
 	}
