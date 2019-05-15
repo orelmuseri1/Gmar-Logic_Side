@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 import org.json.JSONObject;
 
@@ -18,13 +19,15 @@ public class SendAllert {
 	
 	int send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String Table) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
-	    JSONObject object = new JSONObject();
-	    object.put("EventDate", Date);
-	    object.put("EventTime", Time);
-	    object.put("Child id",String.valueOf(ID));
-	    object.put("Level", Level);
-	    object.put("Events leading", EventsLeading);
-	    object.put("Action needed", Action);
+		String uniqueID = UUID.randomUUID().toString();
+		JSONObject object = new JSONObject();
+	    object.put("alertDate", Date);
+	    object.put("alertTime", Time);
+	    object.put("childID",String.valueOf(ID));
+	    object.put("level", Level);
+	    object.put("timePast", "1");//events leading miss and what is that timepast
+	    object.put("actionNeeded", Action);
+	    object.put("alertID", uniqueID);
 	   
 	    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("POST");
@@ -35,7 +38,7 @@ public class SendAllert {
 		conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
 		conn.setChunkedStreamingMode(0);
 		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		System.out.println(object.toString());
+		//System.out.println(object.toString());
 		wr.write(object.toString());
 		wr.flush();
 		StringBuilder sb = new StringBuilder();  
@@ -49,7 +52,7 @@ public class SendAllert {
 			br.close();
 
 			JSONObject myResponse = new JSONObject(sb.toString());
-			System.out.println(myResponse); // בעיה ראשונה יש בעיה לשלוח בעברית שניה המרכאות שאני שולח נשמרות עם הסימנים בגיסון
+			System.out.println(myResponse); 
 				} else {
 				    System.out.println(conn.getResponseMessage());  
 				}  

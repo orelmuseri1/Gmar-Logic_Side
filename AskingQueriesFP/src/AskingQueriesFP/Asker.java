@@ -45,8 +45,11 @@ public class Asker {
 			countermsg += DailyWaterCheck(myConn,1,WhatIsTheDate(),getKids(myConn)); 
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			}
+		
+		countermsg += DailyVomitusCheck(myConn,1, WhatIsTheDate(), getKids(myConn));
+		
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			countermsg += DailyVomitusCheck(myConn,1, WhatIsTheDate(), getKids(myConn));
+			
 			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
 			countermsg += DailyWaterCheck(myConn,2,WhatIsTheDate(),getKids(myConn));
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
@@ -62,41 +65,32 @@ public class Asker {
 	int DailyVomitusCheck(Connection myConn,int time ,String[] today,ResultSet kids) throws Exception {
 		int value=0;
 		try {
-			String[] dateEvent,temp;
-			int counter=0,numOfEvents=1;
+			int counterV=0,numOfEvents=1;
 			while(kids.next()) {															// pass all the kids 
 				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
 				ResultSet events= getSet(myConn, kids.getString("childID"), "Vomitus",WhatIsTheDate());
 				while(events.next()) {																		//pass all the events
-					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
-					temp = dateEvent[2].toString().split(",");
-					dateEvent[2]=temp[0];
-					if(time==1) {
-						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-						numOfEvents++;
-						counter++;
-					}
-					else if(time==2) {
-						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-						numOfEvents++;
-						counter++;
-						}
-					
+					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+					numOfEvents++;
+					if(events.getString("type").equals("פליטה מוגברת"))
+					counterV++;
+					if(events.getString("type").equals("הקאה"))
+						counterV+=2;
 				}if(time==1) {
-					if(counter==2) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"סביר",object, " הילד פלט/הקיא מספר חריג של פעמים","Vomitus");
+					if(counterV==2) {
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, " הילד פלט/הקיא מספר חריג של פעמים","Vomitus");
 					value++;}
-					if(counter>2) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "סכנת התייבשות לתת לילד מים!","Vomitus");
+					if(counterV>2) {
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object, "סכנת התייבשות לתת לילד מים!","Vomitus");
 					value++;}
 				}
 				else if(time==2) {
-					if(counter>3) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ","Vomitus");
+					if(counterV>3) {
+						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object, "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ","Vomitus");
 					value++;}
 					}
-				counter = 0;
+				counterV = 0;
 				numOfEvents=1;
 			}
 			
@@ -136,7 +130,7 @@ public class Asker {
 				if(time == 1) {
 					if(counterWater<600) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "הילד לא שתה מספיק מים היום!","Water");
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שתה מספיק מים היום!","Water");
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -147,7 +141,7 @@ public class Asker {
 				else if(time == 2) {
 					if(counterWater<300) { 		// if he drink less than he actualy need in the half of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "הילד לא שתה מספיק מים היום!","Water");
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שתה מספיק מים היום!","Water");
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -193,7 +187,7 @@ public class Asker {
 				}
 					if(counterWater<1350) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object, "הילד לא שותה מספיק מים !","Water"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שותה מספיק מים !","Water"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -263,7 +257,7 @@ public class Asker {
 				if(time == 1) {
 					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -275,7 +269,7 @@ public class Asker {
 				if(time == 2) {
 					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -292,8 +286,6 @@ public class Asker {
 		}
 		return value;
 	}
-	
-	
 	
 
 	
@@ -349,7 +341,7 @@ public class Asker {
 				if(time == 1) {
 					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -359,7 +351,7 @@ public class Asker {
 				}else if(time == 2) {
 					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"לא תקין",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
+							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
