@@ -45,11 +45,8 @@ public class Asker {
 			countermsg += DailyWaterCheck(myConn,1,WhatIsTheDate(),getKids(myConn)); 
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
 			}
-		
-		countermsg += DailyVomitusCheck(myConn,1, WhatIsTheDate(), getKids(myConn));
-		
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			
+			countermsg += DailyVomitusCheck(myConn,1, WhatIsTheDate(), getKids(myConn));
 			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
 			countermsg += DailyWaterCheck(myConn,2,WhatIsTheDate(),getKids(myConn));
 			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
@@ -169,11 +166,12 @@ public class Asker {
 			while(kids.next()) {																			// pass all the kids 
 				 JSONObject object = new JSONObject();
 				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid and his ID
-				ResultSet events=getSet(myConn, kids.getString("childID"), "Water",WhatIsTheDate());	
+				ResultSet events=getAllSet(myConn, kids.getString("childID"), "Water");	
 				while(events.next()) {																		//pass all the events
 					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
 					temp = dateEvent[2].toString().split(",");
 					dateEvent[2]=temp[0];
+					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
 					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
 					numOfEvents++;
 					if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
@@ -184,6 +182,7 @@ public class Asker {
 						counterWater += 0.4*events.getInt("amount");
 					else if(events.getString("consumedAmount").equals("nothing"))
 						counterWater += 0*events.getInt("amount");
+					}
 				}
 					if(counterWater<1350) { 		// if he drink less than he actualy need near to the end of the day
 						try {
@@ -430,6 +429,13 @@ public class Asker {
 	ResultSet getSet(Connection myConn,String kid,String tableName,String[] date) throws SQLException {
 		Statement mystmt = myConn.createStatement();
 		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE (childID = "+kid + " AND eventDate ="  + "\""+date[0]+"/"+date[1]+"/"+date[2]+"\")";
+		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
+		return events;
+	}
+	
+	ResultSet getAllSet(Connection myConn,String kid,String tableName) throws SQLException {
+		Statement mystmt = myConn.createStatement();
+		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE child = "+kid;
 		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
 		return events;
 	}

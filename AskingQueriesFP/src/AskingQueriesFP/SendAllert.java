@@ -61,7 +61,7 @@ public class SendAllert {
 		
 	}
 	
-	// sent alert thet event color change in table and give the ID of the event that cange for the client
+	// sent alert that event color change in table and give the ID of the event that cange for the client
 	int sendColorAlert(String ID,String Table,int Color) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); 
 	    JSONObject object = new JSONObject();
@@ -99,7 +99,7 @@ public class SendAllert {
 		return 0;
 	}
 
-	// sent put that Cange the alert color
+	// sent put that Change the event color
 	int sendPutColor(String ID, JSONObject object,String table) throws Exception{	
 			URL	url = new URL("http://127.0.0.1:5000/events/"+table+"/"+ID); 
 		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -150,6 +150,7 @@ public class SendAllert {
 		if(counterEvents !=0.0)return statColors/counterEvents;
 		else return 0;
 	}
+	
 	
 	
 	//======================================LiquidFoods===========================================//		
@@ -382,7 +383,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Vomitus =  getSet(myConn,"Vomitus",date);
 		while(Vomitus.next()) {
-		 	if(Vomitus.getString("level")=="null") {
+		 	if(Vomitus.getString("level")!="null") {
 			System.out.println(color);
 			color = 1;
 			counterEvents++;
