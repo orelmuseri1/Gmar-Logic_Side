@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class SendAllert {
 	float counterEvents=0,statColors=0;
 	
-	int send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String Table) throws Exception{	
+	String send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String rule) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
 		String uniqueID = UUID.randomUUID().toString();
 		JSONObject object = new JSONObject();
@@ -25,10 +25,11 @@ public class SendAllert {
 	    object.put("alertTime", Time);
 	    object.put("childID",String.valueOf(ID));
 	    object.put("level", Level);
-	    object.put("timePast", "1");//events leading miss and what is that timepast
+	    object.put("eventsLeading", EventsLeading);//events leading miss and what is that timepast
 	    object.put("actionNeeded", Action);
 	    object.put("alertID", uniqueID);
-	   
+	   object.put("rule",rule);
+	    
 	    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/json; charsets=UTF_8"); //  x-www-form-urlencoded   application/json; charsets=UTF_8
@@ -56,7 +57,7 @@ public class SendAllert {
 				} else {
 				    System.out.println(conn.getResponseMessage());  
 				}  
-		return 0;
+		return uniqueID;
 		
 		
 	}
