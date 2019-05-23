@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class SendAllert {
 	float counterEvents=0,statColors=0;
 	
-	String send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String rule) throws Exception{	
+	 String send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String rule) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
 		String uniqueID = UUID.randomUUID().toString();
 		JSONObject object = new JSONObject();
@@ -159,7 +159,7 @@ public class SendAllert {
 		ResultSet LiquidFoods=  getSet(myConn,"LiquidFood",date);
 		while(LiquidFoods.next()) {
 			int color = 1;
-			if(LiquidFoods.getString("level")=="null") {
+			if(LiquidFoods.getString("level")==null) {
 				counterEvents++;
 				if(LiquidFoods.getString("consumedAmount").equals("לא אכל")) {
 					color = 3;
@@ -198,7 +198,7 @@ public class SendAllert {
 		ResultSet Parasites=  getSet(myConn,"Parasites",date);
 		int color=1;
 		while(Parasites.next()) {
-			if(Parasites.getString("level")=="null") {
+			if(Parasites.getString("level")==null) {
 				color = 1;
 				counterEvents++;
 				if(Parasites.getString("type").equals("כינים")) {
@@ -227,7 +227,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet Cough =  getSet(myConn,"Cough",date);
 		while(Cough.next()) {
-			if(Cough.getString("level")=="null") {
+			if(Cough.getString("level")==null) {
 				color = 1;
 				counterEvents++;
 				if(Cough.getString("type").equals("טורדני")) {
@@ -256,7 +256,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet Feces=  getSet(myConn,"Feces",date);
 		while(Feces.next()) {
-			if(Feces.getString("level")=="null") {
+			if(Feces.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Feces.getString("texture").equals("רירי")) {
@@ -309,7 +309,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Secretion=  getSet(myConn,"Secretion",date);
 		while(Secretion.next()) {
-			if(Secretion.getString("level")=="null") {
+			if(Secretion.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Secretion.getString("type").equals("דם")) {
@@ -343,7 +343,7 @@ public class SendAllert {
 		int color =1;
 		ResultSet SolidFood=  getSet(myConn,"SolidFood",date);
 		while(SolidFood.next()) {
-			if(SolidFood.getString("level")=="null") {
+			if(SolidFood.getString("level")==null) {
 				color = 1;
 				counterEvents++;
 				if(SolidFood.getString("consumedAmount").equals("לא אכל")) {
@@ -384,7 +384,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Vomitus =  getSet(myConn,"Vomitus",date);
 		while(Vomitus.next()) {
-		 	if(Vomitus.getString("level")!="null") {
+		 	if(Vomitus.getString("level")==null) {
 			System.out.println(color);
 			color = 1;
 			counterEvents++;
@@ -414,7 +414,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Urine=  getSet(myConn,"Urine",date);
 		while(Urine.next()) {
-			if(Urine.getString("level")=="null") {
+			if(Urine.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Urine.getString("color").equals("צהוב כהה עד חום בהיר")) {
@@ -458,7 +458,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Sleep=  getSet(myConn,"Sleep",date);
 		while(Sleep.next()) {
-			if(Sleep.getString("level")=="null") {
+			if(Sleep.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Sleep.getString("sleepingScope").equals("אי שינה")) {
@@ -489,7 +489,7 @@ public class SendAllert {
 		int color = 1;
 		ResultSet Fever=  getSet(myConn,"Fever",date);
 		while(Fever.next()) {
-			if(Fever.getString("level")=="null") {
+			if(Fever.getString("level")==null) {
 				counterEvents++;
 				color=1;
 				if(Fever.getString("tempreture").equals("מתחת לטווח תקין")) {
@@ -521,7 +521,8 @@ public class SendAllert {
 			int color = 1;
 			ResultSet Water=  getSet(myConn,"Water",date);
 			while(Water.next()) {
-				if(Water.getString("level")=="null") {
+				System.out.println(Water.getString("level"));
+				if(Water.getString("level")==null) {
 					counterEvents++;
 					color=1;
 					if(Water.getString("consumedAmount").equals("לא שתה")) {
@@ -553,7 +554,7 @@ public class SendAllert {
 		void Disease(Connection myConn,String[] date) throws Exception{
 			ResultSet Disease=  getSet(myConn,"Disease",date);
 			while(Disease.next()) {
-				if(Disease.getString("level")=="null") {
+				if(Disease.getString("level")==null) {
 					counterEvents++;
 					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
 					JSONObject object = new JSONObject();
@@ -575,7 +576,7 @@ public class SendAllert {
 		void Rash(Connection myConn,String[] date) throws Exception{
 			ResultSet Rash=  getSet(myConn,"Rash",date);
 			while(Rash.next()) {
-				if(Rash.getString("level")=="null") {
+				if(Rash.getString("level")==null) {
 					counterEvents++;
 					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
 					JSONObject object = new JSONObject();
@@ -600,7 +601,7 @@ public class SendAllert {
 	ResultSet getSet(Connection myConn,String tableName,String[] date) throws SQLException {
 		Statement mystmt = myConn.createStatement();
 		//System.out.println("SELECT * FROM "+tableName+" WHERE eventDate = "+date[0]+"/"+date[1]+"/"+date[2]);
-		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE eventDate = " +"\""+date[0]+"/"+date[1]+"/"+date[2]+"\"";
+		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE STRCMP(SUBSTRING(eventDate, 1,10),"+"\""+date[0]+"/"+date[1]+"/"+date[2]+"\")=0";
 		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
 		return events;
 	}
