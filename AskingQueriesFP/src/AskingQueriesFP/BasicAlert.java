@@ -14,13 +14,12 @@ public class BasicAlert {
 	String  actionNeeded;
 	JSONObject EventsLeading;
 	//constrctor
-	public BasicAlert(int childID, String level, String alertTime, String alertDate,
+	public BasicAlert(int childID, String level, String alertDate,
 			String actionNeeded) {
 		super();
 		String uniqueID = UUID.randomUUID().toString();
 		this.childID = childID;
 		this.level = level;
-		AlertTime = alertTime;
 		AlertDate = alertDate;
 		this.alertID = uniqueID;
 		this.actionNeeded = actionNeeded;
@@ -41,14 +40,6 @@ public class BasicAlert {
 
 		public void setLevel(String level) {
 			this.level = level;
-		}
-
-		public String getAlertTime() {
-			return AlertTime;
-		}
-
-		public void setAlertTime(String alertTime) {
-			AlertTime = alertTime;
 		}
 
 		public String getAlertDate() {
@@ -79,7 +70,6 @@ public class BasicAlert {
 		JSONObject getJson() throws JSONException {
 			JSONObject object = new JSONObject();
 		    object.put("alertDate", this.getAlertDate());
-		    object.put("alertTime", this.getAlertTime());
 		    object.put("childID",String.valueOf(this.getChildID()));
 		    object.put("level", this.getLevel());
 		    object.put("actionNeeded", this.getActionNeeded());
