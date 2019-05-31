@@ -30,7 +30,7 @@ public class Asker {
 	String userName;
 	String password;
 	SendAllert sender;
-	GetEvent getter;
+	GetEvent getter=new GetEvent();
 	float countercolorsEvents=0,statColors=0;
 	//constructor
 	Asker(int port, String userName, String password){
