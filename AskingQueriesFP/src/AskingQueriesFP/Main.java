@@ -1,7 +1,8 @@
 package AskingQueriesFP;
 
-import java.sql.SQLException;
-import java.text.ParseException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Main {
 	
@@ -13,10 +14,10 @@ public class Main {
 		Asker asker = new Asker(port,userName,password);
 		int ellerts=asker.ask();
 		System.out.println(ellerts);
-	}
-	int connection() {
-		
-		return 0;
+		GetEvent g=new GetEvent();
+		//g.send();
+        
+
 	}
 	
 	

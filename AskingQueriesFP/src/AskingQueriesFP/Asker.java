@@ -1,17 +1,22 @@
 package AskingQueriesFP;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -25,7 +30,8 @@ public class Asker {
 	String userName;
 	String password;
 	SendAllert sender;
-	
+	GetEvent getter;
+	float countercolorsEvents=0,statColors=0;
 	//constructor
 	Asker(int port, String userName, String password){
 		this.port=port;
@@ -36,76 +42,84 @@ public class Asker {
 	
 	
 	int ask() throws Exception {
-		Connection myConn = null;
+		//Connection myConn = null;
 		int countermsg = 0; //counting how match msg he send to the system in this run
-		myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
-		countermsg +=  sender.checkColorsAlerts(myConn,WhatIsTheDate());
+		//myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
+		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-			countermsg += DailyDiaperCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
-			countermsg += DailyWaterCheck(myConn,1,WhatIsTheDate(),getKids(myConn)); 
-			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),1,getKids(myConn));
+			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getJsons("allAttendedChildren"));
+			countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getJsons("allAttendedChildren")); 
+			countermsg += DailyFoodCheck(WhatIsTheDate(0),1,getJsons("allAttendedChildren"));
 			}
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			countermsg += DailyVomitusCheck(myConn,1, WhatIsTheDate(), getKids(myConn));
-			countermsg +=DailyDiaperCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
-			countermsg += DailyWaterCheck(myConn,2,WhatIsTheDate(),getKids(myConn));
-			countermsg += DailyFoodCheck(myConn,WhatIsTheDate(),2,getKids(myConn));
-			countermsg += DailyTypeDiaperCheck(myConn,WhatIsTheDate(),getKids(myConn));
-			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
-				countermsg += XDaysEgoUrineDiaperCheck(myConn,WhatIsTheDate(),getKids(myConn));
-				countermsg += XDaysEgoWaterCheck(myConn,WhatIsTheDate(),getKids(myConn));
-				countermsg += DailyVomitusCheck(myConn,2, WhatIsTheDate(), getKids(myConn));
+			countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getJsons("allAttendedChildren"));
+			countermsg +=DailyDiaperCheck(WhatIsTheDate(0),2,getJsons("allAttendedChildren"));
+			countermsg += DailyWaterCheck(2,WhatIsTheDate(0),getJsons("allAttendedChildren"));
+			countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getJsons("allAttendedChildren"));
+			countermsg += DailyTypeDiaperCheck(WhatIsTheDate(0),getJsons("allAttendedChildren"));
+		if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
+				countermsg += XDaysEgoUrineDiaperCheck(getJsons("allAttendedChildren"));
+				countermsg += XDaysEgoWaterCheck(getJsons("allAttendedChildren"));
+				countermsg += DailyVomitusCheck(2,WhatIsTheDate(0), getJsons("allAttendedChildren"));
 				}
 			 }
 		return countermsg;
 		}
 	
 	//=====================================================================querys=====================================================================//
-	int DailyVomitusCheck(Connection myConn,int time ,String[] today,ResultSet kids) throws Exception {
+	int DailyVomitusCheck(int time ,String[] today,JSONArray kids) throws Exception {
 		int value=0;
 		try {
 			int counterV=0,numOfEvents=1,numOfAlerts=0;
 			JSONObject counetrAlerts = new JSONObject();
-			while(kids.next()) {															// pass all the kids 
-				 JSONObject object = new JSONObject();
-				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
-				ResultSet events= getSet(myConn, kids.getString("childID"), "Vomitus",WhatIsTheDate());
-				while(events.next()) {																		//pass all the events
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-					numOfEvents++;
-					if(events.getString("type").equals("פליטה מוגברת"))
-					counterV++;
-					if(events.getString("type").equals("הקאה"))
-						counterV+=2;
-				}if(time==1) {
+			JSONArray jsonEvent = getJsonsWithDate("Vomitus",today[0]+"-"+today[1]+"-"+today[2]);
+			if(time==2) {
+				jsonEvent.put(getJsonsWithDate("Vomitus",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
+				jsonEvent.put(getJsonsWithDate("Vomitus",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+			}
+			for(int j=0;j<kids.length();j++) {	
+				JSONObject object = new JSONObject();
+				 for(int i=0;i<jsonEvent.length();i++) {
+						if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+							numOfEvents++;
+							if(jsonEvent.getJSONObject(i).getString("type").equals("פליטה מוגברת"))
+							counterV++;
+							if(jsonEvent.getJSONObject(i).getString("type").equals("הקאה"))
+								counterV+=2;
+						}
+					}
+				if(time==1) {
 					if(counterV==2) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, " הילד פלט/הקיא מספר חריג של פעמים","מספר חריג חוזר של הקאות או פליטות");
+						sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, " הילד פלט/הקיא מספר חריג של פעמים","מספר חריג חוזר של הקאות או פליטות");
 						numOfAlerts++;
-						counetrAlerts.put(String.valueOf(numOfAlerts), events.getString("childID"));
+						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
 						value++;
 					}
 					if(counterV>2) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object, "סכנת התייבשות לתת לילד מים!","מספר חריג חוזר של הקאות או פליטות");
+						sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object, "סכנת התייבשות לתת לילד מים!","מספר חריג חוזר של הקאות או פליטות");
 						value++;
 						numOfAlerts++;
-						counetrAlerts.put(String.valueOf(numOfAlerts), events.getString("childID"));
+						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
 					}
-				}
+				
 				else if(time==2) {
 					if(counterV>3) {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object, "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ","מספר חריג חוזר של הקאות או פליטות");
+						sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object, "בימים אחרונים הילד פלטֿֿ/הקיא מספר חריג של פעמים ","מספר חריג חוזר של הקאות או פליטות");
 					value++;
 					numOfAlerts++;
-					counetrAlerts.put(String.valueOf(numOfAlerts), events.getString("childID"));
+					counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
 					}
 				}
 				counterV = 0;
 				numOfEvents=1;
 			}
 			if(numOfAlerts>3) {
-				sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",counetrAlerts, "לבדוק את האוכל שהוגש היום לאותם ילדים","מספר חריג של ילדים הקיאו היום");
+				JSONObject kidsAlerts = new JSONObject();
+				kidsAlerts.put("alerts", counetrAlerts);
+				sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",kidsAlerts, "לבדוק את האוכל שהוגש היום לאותם ילדים","מספר חריג של ילדים הקיאו היום");
 			}
-			
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,36 +128,31 @@ public class Asker {
 	}
 	
 	 // check the amount of water every child drink in the end of the day and the midlle of the day
-	int DailyWaterCheck(Connection myConn, int time,String[] today,ResultSet kids) throws Exception {
+	int DailyWaterCheck(int time,String[] today,JSONArray kids) throws Exception {
 		int value=0,numOfEvents=1;
 		try {
-			String[] dateEvent,temp;
 			int counterWater = 0;
-			while(kids.next()) {															// pass all the kids 
-				JSONObject object = new JSONObject();
-				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));        // print the name of the kid
-				ResultSet events= getSet(myConn, kids.getString("childID"), "Water",WhatIsTheDate());
-				while(events.next()) {																		//pass all the events
-				System.out.println(events.getString("eventDate")+events.getString("childID"));
-					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
-					temp = dateEvent[2].toString().split(",");
-					dateEvent[2]=temp[0];
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+			JSONArray jsonEvent = getJsonsWithDate("Water",today[0]+"-"+today[1]+"-"+today[2]);
+			for(int j=0;j<kids.length();j++) {		
+				JSONObject object = new JSONObject();// pass all the kids 
+				for(int i=0;i<jsonEvent.length();i++) {
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
 						numOfEvents++;
-						//System.out.println(events.getString("child")+"-"+ events.getString("amount") + "-" + events.getString("consumedAmount") + "-" + events.getString("eventDate")); //print the id of the kid the amount of water he get and the amount he actualy drink
-						if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
-							counterWater += events.getInt("amount");
-						else if(events.getString("consumedAmount").equals("more than half"))
-							counterWater += 0.6*events.getInt("amount");
-						else if(events.getString("consumedAmount").equals("less than half"))
-							counterWater += 0.4*events.getInt("amount");
-						else if(events.getString("consumedAmount").equals("nothing"))
-							counterWater += 0*events.getInt("amount");
+							if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
+								counterWater += jsonEvent.getJSONObject(i).getInt("amount");
+							else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("more than half"))
+								counterWater += 0.6*jsonEvent.getJSONObject(i).getInt("amount");
+							else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("less than half"))
+								counterWater += 0.4*jsonEvent.getJSONObject(i).getInt("amount");
+							else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("nothing"))
+								counterWater += 0*jsonEvent.getJSONObject(i).getInt("amount");
+					}
 				}
 				if(time == 1) {
 					if(counterWater<600) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שתה מספיק מים היום!","הילד לא שתה את הכמות המומלצת היום(600)");
+							sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שתה מספיק מים היום!","הילד לא שתה את הכמות המומלצת היום(600)");
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -154,12 +163,12 @@ public class Asker {
 				else if(time == 2) {
 					if(counterWater<300) { 		// if he drink less than he actualy need in the half of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שתה מספיק מים היום!","הילד לא שתה את הכמות המומלצת היום(300)");
+							sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שתה מספיק מים היום!","הילד לא שתה את הכמות המומלצת היום(300)");
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} // the function that makes the alert
+						} 
 					}
 						counterWater=0;
 						numOfEvents=1;
@@ -171,38 +180,34 @@ public class Asker {
 		}
 		return value;
 	}
-	
+
 	//check the amount of water every child drink in the pass coupl days(3)
-	int XDaysEgoWaterCheck(Connection myConn,String[] today,ResultSet kids) throws Exception { 
+	int XDaysEgoWaterCheck(JSONArray kids) throws Exception { 
 		int value=0;
 		try {
-			String[] dateEvent,temp;
 			int counterWater = 0,numOfEvents=1;
-
-			while(kids.next()) {																			// pass all the kids 
+			 JSONArray jsonEvent = getJsonsWithDate("Water",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]);
+			 jsonEvent.put(getJsonsWithDate("Water",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
+			 jsonEvent.put(getJsonsWithDate("Water",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+			for(int j=0;j<kids.length();j++) {	
 				 JSONObject object = new JSONObject();
-				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));          // print the name of the kid and his ID
-				ResultSet events=getAllSet(myConn, kids.getString("childID"), "Water");	
-				while(events.next()) {																		//pass all the events
-					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
-					temp = dateEvent[2].toString().split(",");
-					dateEvent[2]=temp[0];
-					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-					numOfEvents++;
-					if(events.getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
-						counterWater += events.getInt("amount");
-					else if(events.getString("consumedAmount").equals("more than half"))
-						counterWater += 0.6*events.getInt("amount");
-					else if(events.getString("consumedAmount").equals("less than half"))
-						counterWater += 0.4*events.getInt("amount");
-					else if(events.getString("consumedAmount").equals("nothing"))
-						counterWater += 0*events.getInt("amount");
-					}
-				}
+				 for(int i=0;i<jsonEvent.length();i++) {
+					 if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+							numOfEvents++;
+							if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
+								counterWater += jsonEvent.getJSONObject(i).getInt("amount");
+							else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("more than half"))
+								counterWater += 0.6*jsonEvent.getJSONObject(i).getInt("amount");
+							else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("less than half"))
+								counterWater += 0.4*jsonEvent.getJSONObject(i).getInt("amount");
+							else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("nothing"))
+								counterWater += 0*jsonEvent.getJSONObject(i).getInt("amount");
+					 }
+				 }
 					if(counterWater<1400) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object, "הילד לא שותה מספיק מים !","הילד לא שתה את הכמות המומלצת היום בימים האחרונים"); // the function that makes the alert
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2],WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "הילד לא שותה מספיק מים !",object,"Water","הילד לא שתה את הכמות המומלצת היום בימים האחרונים")); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -220,79 +225,68 @@ public class Asker {
 		return value;
 	}
 	
-	
-	
-	
 	//check the amount of food the every kid eat today
-	int DailyFoodCheck(Connection myConn,String[] today,int time,ResultSet kids) throws Exception {
+	int DailyFoodCheck(String[] today,int time,JSONArray kids) throws Exception {
 		int value=0,numOfEvents=1;
 		try {
-			String[] dateEvent,temp;
-			float counterWater = 0;
-			while(kids.next()) {																				// pass each kid
+			float counterFood = 0;
+			 JSONArray jsonEvent = getJsonsWithDate("SolidFood",today[0]+"-"+today[1]+"-"+today[2]);
+			 JSONArray jsonEvent2 = getJsonsWithDate("LiquidFood",today[0]+"-"+today[1]+"-"+today[2]);
+			for(int j=0;j<kids.length();j++) {																		// pass each kid
 				 JSONObject object = new JSONObject();
-				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid
-				ResultSet events = getSet(myConn, kids.getString("childID"), "SolidFood",WhatIsTheDate());	
-				while(events.next()) {																			//pass all the events
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-					numOfEvents++;
-					dateEvent = events.getString("eventDate").split("/");										//getting the date and the time of the event a
-					temp = dateEvent[2].toString().split(",");
-					dateEvent[2]=temp[0];
-				if(events.getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
-							counterWater += 1;}
-						else if(events.getString("consumedAmount").equals("more than half")) {
-							counterWater += 0.6;}
-						else if(events.getString("consumedAmount").equals("less than half")) {
-							counterWater += 0.4;}
-						else if(events.getString("consumedAmount").equals("nothing")) {
-							counterWater += 0;}					
+				for(int i=0;i<jsonEvent.length();i++) {																			//pass all the events
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						numOfEvents++;
+						if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
+							counterFood += 1;}
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("more than half")) {
+							counterFood += 0.6;}
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("less than half")) {
+							counterFood += 0.4;}
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("nothing")) {
+							counterFood += 0;}					
+					}
 				}
 				// need to know what is the real amout of food that need to count
-				ResultSet events2 =  getSet(myConn, kids.getString("childID"), "LiquidFood",WhatIsTheDate());		
-				while(events2.next()) {
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-					numOfEvents++;
-					dateEvent = events2.getString("eventDate").split("/");										//getting the date and the time of the event a
-					temp = dateEvent[2].toString().split(",");
-					dateEvent[2]=temp[0];
-					if(today[0].equals(dateEvent[0])&&today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])) {  //if the date of the event is today
-						System.out.println(events2.getString("child")+ "-" + events2.getString("consumedAmount") + "-" + events2.getString("eventDate")+ " L"); //print the id of the kid the amount of water he get and the amount he actualy drink
-						if(events2.getString("consumedAmount").equals("finish")) {									//checking the amount he drink and sum the amount he drink all day
-							counterWater += 1;}
-						else if(events2.getString("consumedAmount").equals("more than half")) {
-							counterWater += 0.6;}
-						else if(events2.getString("consumedAmount").equals("less than half")) {
-							counterWater += 0.4;}
-						else if(events2.getString("consumedAmount").equals("nothing")) {
-							counterWater += 0;}
-						
+				for(int i=0;i<jsonEvent2.length();i++) {																			//pass all the events
+					if(jsonEvent2.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventId"));
+						numOfEvents++;
+						if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
+							counterFood += 1;}
+						else if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("more than half")) {
+							counterFood += 0.6;}
+						else if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("less than half")) {
+							counterFood += 0.4;}
+						else if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("nothing")) {
+							counterFood += 0;}					
 					}
 				}
 				if(time == 1) {
-					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
+					if(counterFood< 0.5) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
+							sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mean everything ok
-						counterWater=0;
+					}
+					counterFood=0;
 				}
 				if(time == 2) {
-					if(counterWater< 1.0) { 		// if he ate less than he actually need near to the end of the day
+					if(counterFood< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
+							sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"הילד לא אכל היום מספיק!","Food"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}else System.out.println(kids.getString("firstName")+ " "+counterWater); // no need actuely to pay attention for else cuz its mean everything ok
-						counterWater=0;
-						numOfEvents=1;
+					}	
+					counterFood=0;
+					numOfEvents=1;
 				}
 			}
 		} catch (SQLException e) {
@@ -302,50 +296,48 @@ public class Asker {
 		return value;
 	}
 	
-
-	
-	
 	//check if the kid was" in the "toalet" today
-	
-	int DailyDiaperCheck(Connection myConn,String[] today,int time,ResultSet kids) throws Exception {
+	int DailyDiaperCheck(String[] today,int time,JSONArray kids) throws Exception {
 		int value=0,numOfEvents=1;
 		try {
-			float counterWater = 0;
-			while(kids.next()) {																				// pass each kid
+			float counterDiapers = 0;
+			JSONArray jsonEvent = getJsonsWithDate("Urine",today[0]+"-"+today[1]+"-"+today[2]);
+			 JSONArray jsonEvent2 = getJsonsWithDate("Feces",today[0]+"-"+today[1]+"-"+today[2]);
+			for(int j=0;j<kids.length();j++) {																				// pass each kid
 				JSONObject object = new JSONObject();
-				//System.out.println(kids.getString("firstName") + "," + kids.getString("childID"));            // print the name of the kid											//creating statement
-				ResultSet events = getSet(myConn, kids.getString("childID"), "Urine",WhatIsTheDate());	
-				while(events.next()) {																			//pass all the events
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-						numOfEvents++;
-						if(events.getString("amount").equals("חיתול מלא"))	{								//checking the amount he drink and sum the amount he drink all day
-							counterWater += 1;}
-						else if(events.getString("amount").equals("כמות רגילה")) {
-							counterWater += 0.6;}
-						else if(events.getString("amount").equals("כמות קטנה")) {
-							counterWater += 0.4;}
-						else if(events.getString("amount").equals("ללא")) {
-							counterWater += 0;}					
+				for(int i=0;i<jsonEvent.length();i++){
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {//pass all the events
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+							numOfEvents++;
+							if(jsonEvent.getJSONObject(i).getString("amount").equals("חיתול מלא"))	{								//checking the amount he drink and sum the amount he drink all day
+								counterDiapers += 1.2;}
+							else if(jsonEvent.getJSONObject(i).getString("amount").equals("כמות רגילה")) {
+								counterDiapers += 0.7;}
+							else if(jsonEvent.getJSONObject(i).getString("amount").equals("כמות קטנה")) {
+								counterDiapers += 0.5;}
+							else if(jsonEvent.getJSONObject(i).getString("amount").equals("ללא")) {
+								counterDiapers += 0.1;}					
+					}
 				}
 				// need to know what is the real amout of food that need to count
-				ResultSet events2 =getSet(myConn, kids.getString("childID"), "Feces",WhatIsTheDate());						//execute the query
-				while(events2.next()) {
-					object.put(String.valueOf(numOfEvents), events2.getString("eventId"));
-					numOfEvents++;
-					if(events2.getString("amount").equals("חיתול מלא")) {									//checking the amount he drink and sum the amount he drink all day
-						counterWater += 1;}
-					else if(events2.getString("amount").equals("כמות רגילה")) {
-						counterWater += 0.6;}
-					else if(events2.getString("amount").equals("כמות קטנה")) {
-						counterWater += 0.4;}
-					else if(events2.getString("amount").equals("ללא")) {
-						counterWater += 0;}
-						
+				for(int i=0;i<jsonEvent2.length();i++) {
+					if(jsonEvent2.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventId"));
+						numOfEvents++;
+						if(jsonEvent2.getJSONObject(i).getString("amount").equals("חיתול מלא")) {									//checking the amount he drink and sum the amount he drink all day
+							counterDiapers += 1.0;}
+						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("כמות רגילה")) {
+							counterDiapers += 0.6;}
+						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("כמות קטנה")) {
+							counterDiapers += 0.4;}
+						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("ללא")) {
+							counterDiapers += 0;}
+						}
 					}
 				if(time == 1) {
-					if(counterWater< 0.5) { 		// if he ate less than he actually need near to the end of the day
+					if(counterDiapers< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
+							sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -353,9 +345,9 @@ public class Asker {
 						}
 					}
 				}else if(time == 2) {
-					if(counterWater< 1.0) { 	
+					if(counterDiapers< 1.5) { 	
 						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
+							sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות הצואה/שתן קטנה","Diaper"); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -363,7 +355,7 @@ public class Asker {
 						}
 					}
 				}
-				counterWater=0;
+				counterDiapers=0;
 				numOfEvents=1;
 			}
 		} catch (SQLException e) {
@@ -373,42 +365,37 @@ public class Asker {
 		return value;
 	}
 	
-	
-	//================================================================using function====================================================================//
-	
-	
-	
 	//function that get time of start and the end and check if now is between  them
-	
-	int DailyTypeDiaperCheck(Connection myConn,String[] today,ResultSet kids) throws Exception{
+	int DailyTypeDiaperCheck(String[] today,JSONArray kids) throws Exception{
 		int value=0,numOfEvents=1,numOfAlerts=0;
 		JSONObject counetrAlerts = new JSONObject();
 		try {
 			float counterFeces = 0;
-			while(kids.next()) {																		
+			JSONArray jsonEvent = getJsonsWithDate("Feces",today[0]+"-"+today[1]+"-"+today[2]);
+			for(int j=0;j<kids.length();j++) {																		
 				JSONObject object = new JSONObject();
-				ResultSet events =getSet(myConn, kids.getString("childID"), "Feces",WhatIsTheDate());		
-				while(events.next()) {
-					object.put(String.valueOf(numOfEvents), events.getString("eventId"));
-					numOfEvents++;
-					if(events.getString("texture").equals("שלשול/מיימי")) {								
-						counterFeces += 1;}
+				for(int i=0;i<jsonEvent.length();i++) {
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						numOfEvents++;
+						if(jsonEvent.getJSONObject(i).getString("texture").equals("שלשול/מיימי")) {								
+							counterFeces += 1;}
 					}
-					if(counterFeces>=3) { 
-						try {
-							sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות חריגה של שלשול-לתת לילד מים ","Feces"); 
-							numOfAlerts++;
-							counetrAlerts.put(String.valueOf(numOfAlerts), kids.getInt("childID"));
-							value++;
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+				}
+				if(counterFeces>=3) { 
+					try {
+						sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"2",object,"כמות חריגה של שלשול-לתת לילד מים ","Feces"); 
+						numOfAlerts++;
+						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getInt("childID"));
+						value++;
+					} catch (Exception e) {
+						e.printStackTrace();
 						}
 					}
-					counterFeces=0;
+				counterFeces=0;
 				numOfEvents=1;
 				if(numOfAlerts>3) {
-					sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",counetrAlerts, "לבדוק את האוכל שהוגש היום לאותם ילדים","מספר חריג של ילדים היה שילשול היום");
+					sender.send(kids.getJSONObject(j).getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",counetrAlerts, "לבדוק את האוכל שהוגש היום לאותם ילדים","מספר חריג של ילדים היה שילשול היום");
 				}
 			}
 		} catch (SQLException e) {
@@ -418,34 +405,33 @@ public class Asker {
 		return value;
 	}
 
-	int XDaysEgoUrineDiaperCheck(Connection myConn,String[] today,ResultSet kids) throws Exception{
+	//function that check the amount of urine in cople days ego
+	int XDaysEgoUrineDiaperCheck(JSONArray kids) throws Exception{
 		int value=0,numOfEvents=1;
 		try {
-			String[] dateEvent,temp;
 			float counterUrine = 0;
-			while(kids.next()) {																				// pass each kid
+			JSONArray jsonEvent = getJsonsWithDate("Urine",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]);
+			jsonEvent.put(getJsonsWithDate("Urine",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
+			 jsonEvent.put(getJsonsWithDate("Urine",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+			for(int j=0;j<kids.length();j++) {																				// pass each kid
 				JSONObject object = new JSONObject();
-				ResultSet events = getAllSet(myConn, kids.getString("childID"), "Urine");	
-				while(events.next()) {																			//pass all the events of the kid
-					dateEvent = events.getString("eventDate").split("/");									//getting the date and the time of the event a
-					temp = dateEvent[2].toString().split(",");
-					dateEvent[2]=temp[0];
-					if(today[1].equals(dateEvent[1])&& today[2].equals(dateEvent[2])&&(today[0].equals(dateEvent[0])||today[0].equals(dateEvent[0]+1)||today[0].equals(dateEvent[0]+2))) {
-						object.put(String.valueOf(numOfEvents), events.getString("eventId"));
+				for(int i=0;i< jsonEvent.length();i++){																			//pass all the events of the kid
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
 						numOfEvents++;
-						if(events.getString("amount").equals("חיתול מלא"))	{							
+						if(jsonEvent.getJSONObject(i).getString("amount").equals("חיתול מלא"))	{							
 							counterUrine += 1;}
-						else if(events.getString("amount").equals("כמות רגילה")) {
+						else if(jsonEvent.getJSONObject(i).getString("amount").equals("כמות רגילה")) {
 							counterUrine += 0.6;}
-						else if(events.getString("amount").equals("כמות קטנה")) {
+						else if(jsonEvent.getJSONObject(i).getString("amount").equals("כמות קטנה")) {
 							counterUrine += 0.4;}
-						else if(events.getString("amount").equals("ללא")) {
+						else if(jsonEvent.getJSONObject(i).getString("amount").equals("ללא")) {
 							counterUrine += 0;}					
 					}
 				}
 				if(counterUrine< 1.0) { 	
 					try {
-						sender.send(kids.getInt("childID"),today[0]+"/"+today[1]+"/"+today[2],today[3]+":"+today[4]+ ":" + today[5],"3",object,"כמות הצואה/שתן קטנה בימים האחרונים","Urine"); // the function that makes the alert
+						sender.send(kids.getJSONObject(j).getInt("childID"),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2],WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"3",object,"כמות הצואה/שתן קטנה בימים האחרונים","Urine"); // the function that makes the alert
 						value++;
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -461,8 +447,469 @@ public class Asker {
 	}
 	
 	
+//===================================================================COLOR FUNCTIONS==============================================================//
+	float checkColorsAlerts(String[] date) throws Exception {
+		LiquidFoods(date);
+		Parasites(date);
+		Cough(date);
+		Feces(date);
+		Secretion(date);
+		SolidFood(date);
+		Vomitus(date);          //didnt do check on general behavior, general note, and medication,
+		Urine(date);				
+		Sleep(date);
+		Fever(date);
+		Water(date);
+		Disease(date);
+		Rash(date);
+		if(countercolorsEvents !=0.0)return statColors/countercolorsEvents;
+		else return 0;
+	}
+	
+	//======================================LiquidFoods===========================================//		
+	void LiquidFoods(String[] date) throws Exception {
+		JSONArray jsonEvent = getter.getJsonsWithDate("LiquidFood",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			int color = 1;
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				countercolorsEvents++;
+				if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("לא אכל")) {
+					color = 3;
+					}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי מנה")) {
+					color= 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעלה לחצי מנה")) {
+					color= 2;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("סיים מנה")) {
+					color= 1;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("אכל מעבר למנה")) {
+					color= 2;
+				}
+				//sendColorAlert(LiquidFoods.getString("eventId"),"LiquidFood",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
+			    object.put("consumedAmount",jsonEvent.getJSONObject(i).getString("consumedAmount"));
+			    object.put("mealType",jsonEvent.getJSONObject(i).getString("mealType"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"LiquidFoodEvent");
+				statColors+=color;
+			}
+		}
+	}
+	
+	//=======================================Parasites============================================//
+	void Parasites(String[] date) throws Exception {
+		int color=1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Parasites",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				color = 1;
+				countercolorsEvents++;
+				if(jsonEvent.getJSONObject(i).getString("type").equals("כינים")) {
+					color = 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("type").equals("תולעים")) {
+					color= 3;
+				}
+				//sendColorAlert(Parasites.getString("eventId"),"Parasites",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"ParasitesEvent");
+				statColors+=color;
+			}
+		}	
+	}
+	
+	//=========================================Cough==============================================//
+	void Cough(String[] date) throws Exception {
+		int color =1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Cough",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				color = 1;
+				countercolorsEvents++;
+				if(jsonEvent.getJSONObject(i).getString("type").equals("טורדני")) {
+					color = 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("type").equals("לח")) {
+					color= 2;
+				}
+				//sendColorAlert(Cough.getString("eventId"),"Cough",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"CoughEvent");
+				statColors+=color;
+			}
+		}
+	}
+	
+	//=========================================Feces==============================================//
+	void Feces(String[] date) throws Exception {
+		int color =1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Feces",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++)  {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				countercolorsEvents++;
+				color=1;
+				if(jsonEvent.getJSONObject(i).getString("texture").equals("רירי")) {
+					color = 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("texture").equals("שילשול/מיימי ")) {
+					color = 2;
+				}
+				if(color!=3) {
+					if(jsonEvent.getJSONObject(i).getString("color").equals("אדום/ורוד")) {
+						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
+					}
+					else if(jsonEvent.getJSONObject(i).getString("color").equals("אדום בוהק")) {
+						color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
+					}
+					else if(jsonEvent.getJSONObject(i).getString("color").equals("לבן אפור/חיוורת בצבע חימר")) {
+						color= 3;
+					}
+					else if(jsonEvent.getJSONObject(i).getString("color").equals("חום בהיר")) {
+						color= 2;
+					}
+				}
+				if(color!=3) {
+					if(jsonEvent.getJSONObject(i).getString("amount").equals("ללא")) {
+						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
+					}
+					else if(jsonEvent.getJSONObject(i).getString("amount").equals("מריחה/כמות קטנה ")) {
+						color= 2; //אלא אם הוא אכל מזונות אדומים למשל סלק
+						}				
+				}
+				//sendColorAlert(Feces.getString("eventId"),"Feces",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
+			    object.put("color",jsonEvent.getJSONObject(i).getString("color"));
+			    object.put("texture",jsonEvent.getJSONObject(i).getString("texture"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"FecesEvent");
+				statColors+=color;
+			}
+		}	
+	}
+	
+	//========================================Secretion===========================================//
+	void Secretion(String[] date) throws Exception {
+		int color = 1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Secretion",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				countercolorsEvents++;
+				color=1;
+				if(jsonEvent.getJSONObject(i).getString("type").equals("דם")) {
+					color = 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("type").equals("מוגלה")) {
+					color = 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("type").equals("נזלת")) {
+					color = 3;
+				}
+				//sendColorAlert(Secretion.getString("eventId"),"Secretion",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("rank",jsonEvent.getJSONObject(i).getString("rank"));
+			    object.put("area",jsonEvent.getJSONObject(i).getString("area"));
+			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"SecretionEvent");
+				statColors+=color;
+			}
+		}
+	}
+	
+	//========================================SolidFood===========================================//
+	void SolidFood(String[] date) throws Exception {
+		int color =1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("SolidFood",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				color = 1;
+				countercolorsEvents++;
+				if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("לא אכל")) {
+					color = 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי מנה")) {
+					color= 3;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעלה לחצי מנה")) {
+					color= 2;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("סיים מנה")) {
+					color= 1;
+				}
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("אכל מעבר למנה")) {
+					color= 2;
+				}
+				//sendColorAlert(SolidFood.getString("eventId"),"SolidFood",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
+			    object.put("consumedAmount",jsonEvent.getJSONObject(i).getString("consumedAmount"));
+			    object.put("mealInMenu",jsonEvent.getJSONObject(i).getString("mealInMenu"));
+			    object.put("mealType",jsonEvent.getJSONObject(i).getString("mealType"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"SolidFoodEvent");
+				statColors+=color;
+			}
+		}
+	}
+	
+	//=========================================Vomitus============================================//
+	void Vomitus(String[] date) throws Exception {
+		int color = 1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Vomitus",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+		 	if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			System.out.println(color);
+			color = 1;
+			countercolorsEvents++;
+			if(jsonEvent.getJSONObject(i).getString("type").equals("הקאה")) {
+				color = 3;
+				}
+			else if(jsonEvent.getJSONObject(i).getString("type").equals("פליטה מוגברת")) {
+				color= 2;
+			}
+			//sendColorAlert(Vomitus.getString("eventId"),"Vomitus",color);
+			JSONObject object = new JSONObject();
+		    object.put("level",color);
+		    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+		    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+		    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+		    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+		    object.put("proper",jsonEvent.getJSONObject(i).getString("proper"));
+		    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+		    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"VomitusEvent");
+			statColors+=color;
+			}
+		}
+	}
+	
+	//==========================================Urine=============================================//
+	void Urine(String[] date) throws Exception {
+		int color = 1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Urine",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				countercolorsEvents++;
+				color=1;
+				if(jsonEvent.getJSONObject(i).getString("color").equals("צהוב כהה עד חום בהיר")) {
+					color= 2; 
+				}
+				else if(jsonEvent.getJSONObject(i).getString("color").equals("אדום")) {
+					color= 3; 
+				}
+				if(color!=3) {
+					if(jsonEvent.getJSONObject(i).getString("fragrance").equals("חריף")) {
+						color= 3;
+					}
+				}
+				if(color!=3) {
+					if(jsonEvent.getJSONObject(i).getString("amount").equals("ללא")) {
+						color= 3; 
+					}
+					if(jsonEvent.getJSONObject(i).getString("amount").equals("מריחה/כמות קטנה ")) {
+						color= 2;
+					}	
+				}
+				//sendColorAlert(Urine.getString("eventId"),"Urine",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
+			    object.put("color",jsonEvent.getJSONObject(i).getString("color"));
+			    object.put("fragrance",jsonEvent.getJSONObject(i).getString("fragrance"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"UrineEvent");
+				statColors+=color;
+			}
+		}
+	}
+
+	//==========================================Sleep=============================================//
+	void Sleep(String[] date) throws Exception {
+		int color = 1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Sleep",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				countercolorsEvents++;
+				color=1;
+				if(jsonEvent.getJSONObject(i).getString("sleepingScope").equals("אי שינה")) {
+					color= 3; 
+				}
+				else if(jsonEvent.getJSONObject(i).getString("sleepingScope").equals("שינה חלקית לא שקטה")) {
+					color= 2; 
+				}
+				//sendColorAlert(Sleep.getString("eventId"),"Sleep",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("allocatedTime",jsonEvent.getJSONObject(i).getString("allocatedTime"));
+			    object.put("sleepingScope",jsonEvent.getJSONObject(i).getString("sleepingScope"));
+			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"SleepEvent");
+				statColors+=color;
+			}
+		}
+	}
+	
+	//==========================================Fever=============================================//
+	void Fever(String[] date) throws Exception{
+		int color = 1;
+		JSONArray jsonEvent = getter.getJsonsWithDate("Fever",date[0]+"-"+date[1]+"-"+date[2]);
+		for(int i=0;i<jsonEvent.length();i++) {
+			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				countercolorsEvents++;
+				color=1;
+				if(jsonEvent.getJSONObject(i).getString("tempreture").equals("מתחת לטווח תקין")) {
+					color= 3; 
+				}
+				else if(jsonEvent.getJSONObject(i).getString("tempreture").equals("חום נמוך")) {
+					color= 2; 
+				}
+				else if(jsonEvent.getJSONObject(i).getString("tempreture").equals("מעל טווח תקין")) {
+					color= 3; 
+				}
+				//sendColorAlert(Fever.getString("eventId"),"Fever",color);
+				JSONObject object = new JSONObject();
+			    object.put("level",color);
+			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+			    object.put("tempreture",jsonEvent.getJSONObject(i).getString("tempreture"));
+			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+				sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"FeverEvent");
+				statColors+=color;
+			}
+		}
+	}
+	
+	//==========================================Water=============================================//
+		void Water(String[] date) throws Exception{
+			int color = 1;
+			JSONArray jsonEvent = getter.getJsonsWithDate("Water",date[0]+"-"+date[1]+"-"+date[2]);
+			for(int i=0;i<jsonEvent.length();i++) {
+				if(jsonEvent.getJSONObject(i).getString("level")==null) {
+					countercolorsEvents++;
+					color=1;
+					if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("לא שתה")) {
+						color= 3; 
+					}
+					else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי בקבוק")) {
+						color= 2; 
+					}
+					else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעל חצי בקבוק")) {
+						color= 2; 
+					}
+					//sendColorAlert(Water.getString("eventId"),"Water",color);
+					JSONObject object = new JSONObject();
+				    object.put("level",color);
+				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+				    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+				    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+				    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+				    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
+				    object.put("consumedAmount",jsonEvent.getJSONObject(i).getString("consumedAmount"));
+				    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+				    sender.	sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"WaterEvent");
+					statColors+=color;
+				}
+			}
+		}
+	
+	//==========================================Disease=============================================//
+		void Disease(String[] date) throws Exception{
+			JSONArray jsonEvent = getter.getJsonsWithDate("Disease",date[0]+"-"+date[1]+"-"+date[2]);
+			for(int i=0;i<jsonEvent.length();i++) {
+				if(jsonEvent.getJSONObject(i).getString("level")==null) {
+					countercolorsEvents++;
+					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
+					JSONObject object = new JSONObject();
+				    object.put("level",String.valueOf(3));
+				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+				    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+				    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+				    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+				    object.put("details",jsonEvent.getJSONObject(i).getString("details"));
+				    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
+				    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"DiseaseEvent");
+					statColors+=3;
+				}
+			}
+		}
+		
+	//==========================================Disease=============================================//
+		void Rash(String[] date) throws Exception{
+			JSONArray jsonEvent = getter.getJsonsWithDate("Rash",date[0]+"-"+date[1]+"-"+date[2]);
+			for(int i=0;i<jsonEvent.length();i++)  {
+				if(jsonEvent.getJSONObject(i).getString("level")==null) {
+					countercolorsEvents++;
+					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
+					JSONObject object = new JSONObject();
+				    object.put("level",String.valueOf(3));
+				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
+				    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
+				    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
+				    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
+				    object.put("area",jsonEvent.getJSONObject(i).getString("area"));
+				    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
+				    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"RashEvent");
+					statColors+=3;
+				}
+			}
+		}
+		
+	
+	//================================================================using function====================================================================//
 
 	//===================time functions==============//
+	//the function check if the time now is between to times
 	boolean checkTime(int starthour,int startmin,int finishhour,int finishmin) { 
 		int hour,min; 
 		String[] time;
@@ -488,25 +935,26 @@ public class Asker {
 		return sMyDate;
 	}
 	
-	String[] WhatIsTheDate() {
-		String [] today = LocalDate.now().toString().split("-"),nowtime,now = null;
-		String hour,min,sec;
-		now= new String[6];
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-		nowtime = timeStamp.split("_");									//getting the date and the time of the event 
-		 hour = nowtime[1].charAt(0) + "" + nowtime[1].charAt(1);
-		 min =  nowtime[1].charAt(2) + "" + nowtime[1].charAt(3);
-		 sec =  nowtime[1].charAt(4) + "" + nowtime[1].charAt(5);
-		now[0] = today[2];
-		now[1] = today[1];
-		now[2] = today[0];
-		now[3] = hour;
-		now[4] = min;
-		now[5] = sec;
-		return now;
+	//function the give me the date minus the number you give (0 is today)
+	String[] WhatIsTheDate(int days) {
+		String [] time,sendDate,date,temp;
+		sendDate= new String[6];
+		
+		final Calendar cal = Calendar.getInstance();
+	    cal.add(Calendar.DATE, -days);
+	    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
+	    temp=dateFormat.format(cal.getTime()).split(",");
+	    date=temp[0].split("/");
+	    time=temp[1].split(":");
+	    sendDate[0]=date[0];
+	    sendDate[1]=date[1];
+	    sendDate[2]=date[2];
+	    sendDate[3]=time[0];
+	    sendDate[4]=time[1];
+	    sendDate[5]=time[2];
+	  	return sendDate;
 	}
-
-
+	
 	
 	//===================DB function=================//
 	ResultSet getKids(Connection myConn) throws SQLException {
@@ -531,4 +979,47 @@ public class Asker {
 		return events;
 	}
 	
+	JSONArray getJsonsWithDate(String table,String date) throws Exception{	
+		URL	url = new URL("http://127.0.0.1:5000/events/"+ table +"Event/"+date);//+date
+		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Content-Type", "application/json;");
+		StringBuilder response = new StringBuilder();  
+		int HttpResult = conn.getResponseCode(); 
+		if (HttpResult == HttpURLConnection.HTTP_OK) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String inputLine;
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			} 
+			in.close();
+		 }
+		JSONObject myResponse = new JSONObject(response.toString());
+		JSONArray jsonarray = myResponse.getJSONArray(table.toLowerCase()+"Event"); 
+		 return jsonarray;
+	}
+
+
+	JSONArray getJsons(String table) throws Exception{	
+	URL	url;
+	
+	url = new URL("http://127.0.0.1:5000/events/"+table+"Events");
+	HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+	conn.setRequestMethod("GET");
+	conn.setRequestProperty("Content-Type", "application/json;");
+	StringBuilder response = new StringBuilder();  
+	int HttpResult = conn.getResponseCode(); 
+	if (HttpResult == HttpURLConnection.HTTP_OK) {
+		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		String inputLine;
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		} 
+		in.close();
+	 }
+	JSONObject myResponse = new JSONObject(response.toString());
+	JSONArray jsonarray = myResponse.getJSONArray("vomitusEvent"); 
+	 return jsonarray;
+	}
+
 }
