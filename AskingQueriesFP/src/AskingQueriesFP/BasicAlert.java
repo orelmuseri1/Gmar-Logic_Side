@@ -51,7 +51,7 @@ public class BasicAlert {
 		}
 
 		public String getAlertID() {
-			return alertID;
+			return alertID; 
 		}
 
 		public void setAlertID(String alertID) {

@@ -11,7 +11,9 @@ import org.json.JSONObject;
 public class GetEvent {
 	JSONArray getJsonsWithDate(String table,String date) throws Exception{	
 		JSONArray jsonarray;
-		URL	url = new URL("http://127.0.0.1:5000/events/"+ table +"Event/"+date);//+date 
+		JSONObject myResponse;
+		//System.out.println("http://127.0.0.1:5000/events/"+ table +"EventByDate/"+date);
+		URL	url = new URL("http://193.106.55.183/events/"+ table +"EventByDate/"+date);//+date 
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("Content-Type", "application/json;");
@@ -25,11 +27,11 @@ public class GetEvent {
 			} 
 			in.close();
 		 }
-		JSONObject myResponse = new JSONObject(response.toString());
+		myResponse = new JSONObject(response.toString());
 		if(table.equals("LiquidFood")) {
 			jsonarray = myResponse.getJSONArray("liquidFoodEvent"); 
 		}else if(table.equals("SolidFood")){
-			jsonarray = myResponse.getJSONArray("SolidFoodEvent"); 
+			jsonarray = myResponse.getJSONArray("solidFoodEvent"); 
 		}else {
 			 jsonarray = myResponse.getJSONArray(table.toLowerCase()+"Event"); 
 		}

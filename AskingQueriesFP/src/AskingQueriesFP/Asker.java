@@ -1,18 +1,12 @@
 package AskingQueriesFP;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -32,6 +26,7 @@ public class Asker {
 	SendAllert sender;
 	GetEvent getter=new GetEvent();
 	float countercolorsEvents=0,statColors=0;
+	
 	//constructor
 	Asker(int port, String userName, String password){
 		this.port=port;
@@ -42,25 +37,23 @@ public class Asker {
 	
 	
 	int ask() throws Exception {
-		//Connection myConn = null;
-		int countermsg = 0; //counting how match msg he send to the system in this run
-		//myConn = DriverManager.getConnection("jdbc:mysql://localhost:" + this.port + "/FinelProjectDB", this.userName, this.password);	
+		int countermsg = 0;
 		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
-			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getJsons("allAttendedChildren"));
-			countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getJsons("allAttendedChildren")); 
-			countermsg += DailyFoodCheck(WhatIsTheDate(0),1,getJsons("allAttendedChildren"));
+			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getJsons("allAttendedChildren"));
+			countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getter.getJsons("allAttendedChildren")); 
+			countermsg += DailyFoodCheck(WhatIsTheDate(0),1,getter.getJsons("allAttendedChildren"));
 			}
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
-			countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getJsons("allAttendedChildren"));
-			countermsg +=DailyDiaperCheck(WhatIsTheDate(0),2,getJsons("allAttendedChildren"));
-			countermsg += DailyWaterCheck(2,WhatIsTheDate(0),getJsons("allAttendedChildren"));
-			countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getJsons("allAttendedChildren"));
-			countermsg += DailyTypeDiaperCheck(WhatIsTheDate(0),getJsons("allAttendedChildren"));
-		if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
-				countermsg += XDaysEgoUrineDiaperCheck(getJsons("allAttendedChildren"));
-				countermsg += XDaysEgoWaterCheck(getJsons("allAttendedChildren"));
-				countermsg += DailyVomitusCheck(2,WhatIsTheDate(0), getJsons("allAttendedChildren"));
+			countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getter.getJsons("allAttendedChildren"));
+			countermsg +=DailyDiaperCheck(WhatIsTheDate(0),2,getter.getJsons("allAttendedChildren"));
+			countermsg += DailyWaterCheck(2,WhatIsTheDate(0),getter.getJsons("allAttendedChildren"));
+			countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getter.getJsons("allAttendedChildren"));
+			countermsg += DailyTypeDiaperCheck(WhatIsTheDate(0),getter.getJsons("allAttendedChildren"));
+			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
+				countermsg += XDaysEgoUrineDiaperCheck(getter.getJsons("allAttendedChildren"));
+				countermsg += XDaysEgoWaterCheck(getter.getJsons("allAttendedChildren"));
+				countermsg += DailyVomitusCheck(2,WhatIsTheDate(0), getter.getJsons("allAttendedChildren"));
 				}
 			 }
 		return countermsg;
@@ -72,10 +65,10 @@ public class Asker {
 		try {
 			int counterV=0,numOfEvents=1,numOfAlerts=0;
 			JSONObject counetrAlerts = new JSONObject();
-			JSONArray jsonEvent = getJsonsWithDate("Vomitus",today[0]+"-"+today[1]+"-"+today[2]);
+			JSONArray jsonEvent = getter.getJsonsWithDate("Vomitus",today[0]+"-"+today[1]+"-"+today[2]);
 			if(time==2) {
-				jsonEvent.put(getJsonsWithDate("Vomitus",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
-				jsonEvent.put(getJsonsWithDate("Vomitus",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+				jsonEvent.put(getter.getJsonsWithDate("Vomitus",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
+				jsonEvent.put(getter.getJsonsWithDate("Vomitus",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
 			}
 			for(int j=0;j<kids.length();j++) {	
 				JSONObject object = new JSONObject();
@@ -128,12 +121,10 @@ public class Asker {
 		}
 		return value;
 	}
-	
-	 // check the amount of water every child drink in the end of the day and the midlle of the day
 	int DailyWaterCheck(int time,String[] today,JSONArray kids) throws Exception {
 		int value=0,numOfEvents=1,consumedAmount = 0,amount=0;
 		try {
-			JSONArray jsonEvent = getJsonsWithDate("Water",today[0]+"-"+today[1]+"-"+today[2]);
+			JSONArray jsonEvent = getter.getJsonsWithDate("Water",today[0]+"-"+today[1]+"-"+today[2]);
 			for(int j=0;j<kids.length();j++) {		
 				JSONObject object = new JSONObject();// pass all the kids 
 				for(int i=0;i<jsonEvent.length();i++) {
@@ -178,15 +169,13 @@ public class Asker {
 		}
 		return value;
 	}
-
-	//check the amount of water every child drink in the pass coupl days(3)
 	int XDaysEgoWaterCheck(JSONArray kids) throws Exception { 
 		int value=0;
 		try {
 			int counterWater = 0,numOfEvents=1;
-			 JSONArray jsonEvent = getJsonsWithDate("Water",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]);
-			 jsonEvent.put(getJsonsWithDate("Water",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
-			 jsonEvent.put(getJsonsWithDate("Water",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+			 JSONArray jsonEvent = getter.getJsonsWithDate("Water",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]);
+			 jsonEvent.put(getter.getJsonsWithDate("Water",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
+			 jsonEvent.put(getter.getJsonsWithDate("Water",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
 			for(int j=0;j<kids.length();j++) {	
 				 JSONObject object = new JSONObject();
 				 for(int i=0;i<jsonEvent.length();i++) {
@@ -228,8 +217,8 @@ public class Asker {
 		int value=0,numOfEvents=1;
 		try {
 			float counterFood = 0;
-			 JSONArray jsonEvent = getJsonsWithDate("SolidFood",today[0]+"-"+today[1]+"-"+today[2]);
-			 JSONArray jsonEvent2 = getJsonsWithDate("LiquidFood",today[0]+"-"+today[1]+"-"+today[2]);
+			 JSONArray jsonEvent = getter.getJsonsWithDate("SolidFood",today[0]+"-"+today[1]+"-"+today[2]);
+			 JSONArray jsonEvent2 = getter.getJsonsWithDate("LiquidFood",today[0]+"-"+today[1]+"-"+today[2]);
 			for(int j=0;j<kids.length();j++) {																		// pass each kid
 				 JSONObject object = new JSONObject();
 				for(int i=0;i<jsonEvent.length();i++) {																			//pass all the events
@@ -299,8 +288,8 @@ public class Asker {
 		int value=0,numOfEvents=1;
 		try {
 			float counterDiapers = 0;
-			JSONArray jsonEvent = getJsonsWithDate("Urine",today[0]+"-"+today[1]+"-"+today[2]);
-			 JSONArray jsonEvent2 = getJsonsWithDate("Feces",today[0]+"-"+today[1]+"-"+today[2]);
+			JSONArray jsonEvent = getter.getJsonsWithDate("Urine",today[0]+"-"+today[1]+"-"+today[2]);
+			 JSONArray jsonEvent2 = getter.getJsonsWithDate("Feces",today[0]+"-"+today[1]+"-"+today[2]);
 			for(int j=0;j<kids.length();j++) {																				// pass each kid
 				JSONObject object = new JSONObject();
 				for(int i=0;i<jsonEvent.length();i++){
@@ -369,7 +358,7 @@ public class Asker {
 		JSONObject counetrAlerts = new JSONObject();
 		try {
 			float counterFeces = 0;
-			JSONArray jsonEvent = getJsonsWithDate("Feces",today[0]+"-"+today[1]+"-"+today[2]);
+			JSONArray jsonEvent = getter.getJsonsWithDate("Feces",today[0]+"-"+today[1]+"-"+today[2]);
 			for(int j=0;j<kids.length();j++) {																		
 				JSONObject object = new JSONObject();
 				for(int i=0;i<jsonEvent.length();i++) {
@@ -408,9 +397,9 @@ public class Asker {
 		int value=0,numOfEvents=1;
 		try {
 			float counterUrine = 0;
-			JSONArray jsonEvent = getJsonsWithDate("Urine",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]);
-			jsonEvent.put(getJsonsWithDate("Urine",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
-			 jsonEvent.put(getJsonsWithDate("Urine",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+			JSONArray jsonEvent = getter.getJsonsWithDate("Urine",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]);
+			jsonEvent.put(getter.getJsonsWithDate("Urine",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
+			 jsonEvent.put(getter.getJsonsWithDate("Urine",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
 			for(int j=0;j<kids.length();j++) {																				// pass each kid
 				JSONObject object = new JSONObject();
 				for(int i=0;i< jsonEvent.length();i++){																			//pass all the events of the kid
@@ -447,6 +436,7 @@ public class Asker {
 	
 //===================================================================COLOR FUNCTIONS==============================================================//
 	
+	//=====================================================================COLORSCHECK===============================================================//
 	float checkColorsAlerts(String[] date) throws Exception {
 		LiquidFoods(date);
 		Parasites(date);
@@ -466,11 +456,12 @@ public class Asker {
 	}
 	
 	//======================================LiquidFoods===========================================//		
+	//==========================================LiquidFoods=============================================//
 	void LiquidFoods(String[] date) throws Exception {
-		JSONArray jsonEvent = getter.getJsonsWithDate("LiquidFood",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("LiquidFood",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
 			int color = 1;
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(Integer.parseInt(jsonEvent.getJSONObject(i).getString("level"))==0) {
 				countercolorsEvents++;
 				if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("לא אכל")) {
 					color = 3;
@@ -491,25 +482,25 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
 			    object.put("consumedAmount",jsonEvent.getJSONObject(i).getString("consumedAmount"));
 			    object.put("mealType",jsonEvent.getJSONObject(i).getString("mealType"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"LiquidFoodEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"LiquidFoodEvent");
 				statColors+=color;
 			}
 		}
 	}
 	
 	//=======================================Parasites============================================//
+	//==========================================Parasites=============================================//
 	void Parasites(String[] date) throws Exception {
 		int color=1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Parasites",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Parasites",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				color = 1;
 				countercolorsEvents++;
 				if(jsonEvent.getJSONObject(i).getString("type").equals("כינים")) {
@@ -522,23 +513,23 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"ParasitesEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"ParasitesEvent");
 				statColors+=color;
 			}
 		}	
 	}
 	
 	//=========================================Cough==============================================//
+	//==========================================Cough=================================================//
 	void Cough(String[] date) throws Exception {
 		int color =1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Cough",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Cough",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				color = 1;
 				countercolorsEvents++;
 				if(jsonEvent.getJSONObject(i).getString("type").equals("טורדני")) {
@@ -551,23 +542,23 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"CoughEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"CoughEvent");
 				statColors+=color;
 			}
 		}
 	}
 	
 	//=========================================Feces==============================================//
+	//==========================================Feces=================================================//
 	void Feces(String[] date) throws Exception {
 		int color =1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Feces",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Feces",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++)  {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				countercolorsEvents++;
 				color=1;
 				if(jsonEvent.getJSONObject(i).getString("texture").equals("רירי")) {
@@ -602,25 +593,25 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
 			    object.put("color",jsonEvent.getJSONObject(i).getString("color"));
 			    object.put("texture",jsonEvent.getJSONObject(i).getString("texture"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"FecesEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"FecesEvent");
 				statColors+=color;
 			}
 		}	
 	}
 	
 	//========================================Secretion===========================================//
+	//==========================================Secretion=============================================//
 	void Secretion(String[] date) throws Exception {
 		int color = 1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Secretion",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Secretion",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				countercolorsEvents++;
 				color=1;
 				if(jsonEvent.getJSONObject(i).getString("type").equals("דם")) {
@@ -636,25 +627,25 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("rank",jsonEvent.getJSONObject(i).getString("rank"));
 			    object.put("area",jsonEvent.getJSONObject(i).getString("area"));
 			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"SecretionEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"SecretionEvent");
 				statColors+=color;
 			}
 		}
 	}
 	
 	//========================================SolidFood===========================================//
+	//==========================================SolidFood=============================================//
 	void SolidFood(String[] date) throws Exception {
 		int color =1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("SolidFood",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("SolidFood",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				color = 1;
 				countercolorsEvents++;
 				if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("לא אכל")) {
@@ -676,26 +667,26 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
 			    object.put("consumedAmount",jsonEvent.getJSONObject(i).getString("consumedAmount"));
 			    object.put("mealInMenu",jsonEvent.getJSONObject(i).getString("mealInMenu"));
 			    object.put("mealType",jsonEvent.getJSONObject(i).getString("mealType"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"SolidFoodEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"SolidFoodEvent");
 				statColors+=color;
 			}
 		}
 	}
 	
 	//=========================================Vomitus============================================//
+	//==========================================Vomitus===============================================//
 	void Vomitus(String[] date) throws Exception {
 		int color = 1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Vomitus",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Vomitus",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-		 	if(jsonEvent.getJSONObject(i).getString("level")==null) {
+		 	if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 			System.out.println(color);
 			color = 1;
 			countercolorsEvents++;
@@ -709,23 +700,23 @@ public class Asker {
 			JSONObject object = new JSONObject();
 		    object.put("level",color);
 		    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-		    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 		    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 		    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 		    object.put("proper",jsonEvent.getJSONObject(i).getString("proper"));
-		    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-		    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"VomitusEvent");
+		    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+		    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"VomitusEvent");
 			statColors+=color;
 			}
 		}
 	}
 	
 	//==========================================Urine=============================================//
+	//==========================================Urine=================================================//
 	void Urine(String[] date) throws Exception {
 		int color = 1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Urine",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Urine",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				countercolorsEvents++;
 				color=1;
 				if(jsonEvent.getJSONObject(i).getString("color").equals("צהוב כהה עד חום בהיר")) {
@@ -751,25 +742,25 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
 			    object.put("color",jsonEvent.getJSONObject(i).getString("color"));
 			    object.put("fragrance",jsonEvent.getJSONObject(i).getString("fragrance"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"UrineEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"UrineEvent");
 				statColors+=color;
 			}
 		}
 	}
 
 	//==========================================Sleep=============================================//
+	//==========================================Sleep=================================================//
 	void Sleep(String[] date) throws Exception {
 		int color = 1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Sleep",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Sleep",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				countercolorsEvents++;
 				color=1;
 				if(jsonEvent.getJSONObject(i).getString("sleepingScope").equals("אי שינה")) {
@@ -782,13 +773,12 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("allocatedTime",jsonEvent.getJSONObject(i).getString("allocatedTime"));
 			    object.put("sleepingScope",jsonEvent.getJSONObject(i).getString("sleepingScope"));
 			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
 			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"SleepEvent");
 				statColors+=color;
 			}
@@ -796,11 +786,12 @@ public class Asker {
 	}
 	
 	//==========================================Fever=============================================//
+	//==========================================Fever=================================================//
 	void Fever(String[] date) throws Exception{
 		int color = 1;
-		JSONArray jsonEvent = getter.getJsonsWithDate("Fever",date[0]+"-"+date[1]+"-"+date[2]);
+		JSONArray jsonEvent = getter.getJsonsWithDate("Fever",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
-			if(jsonEvent.getJSONObject(i).getString("level")==null) {
+			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				countercolorsEvents++;
 				color=1;
 				if(jsonEvent.getJSONObject(i).getString("tempreture").equals("מתחת לטווח תקין")) {
@@ -816,23 +807,25 @@ public class Asker {
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-			    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("tempreture",jsonEvent.getJSONObject(i).getString("tempreture"));
-			    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-				sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"FeverEvent");
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+				sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"FeverEvent");
 				statColors+=color;
 			}
 		}
 	}
 	
 	//==========================================Water=============================================//
+	//==========================================Water=================================================//
 	void Water(String[] date) throws Exception{
 			int color = 1;
-			JSONArray jsonEvent = getter.getJsonsWithDate("Water",date[0]+"-"+date[1]+"-"+date[2]);
+			JSONArray jsonEvent = getter.getJsonsWithDate("Water",date[2]+"-"+date[1]+"-"+date[0]);
+			//System.out.println(jsonEvent.length()+" "+date[0]+"-"+date[1]+"-"+date[2]);
 			for(int i=0;i<jsonEvent.length();i++) {
-				if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				//System.out.println(Integer.parseInt(jsonEvent.getJSONObject(i).getString("level")));
+				if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 					countercolorsEvents++;
 					color=1;
 					
@@ -846,57 +839,54 @@ public class Asker {
 					JSONObject object = new JSONObject();
 				    object.put("level",color);
 				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-				    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 				    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 				    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 				    object.put("amount",jsonEvent.getJSONObject(i).getString("amount"));
 				    object.put("consumedAmount",jsonEvent.getJSONObject(i).getString("consumedAmount"));
-				    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-				    sender.	sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"WaterEvent");
+				    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+				    sender.	sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"WaterEvent");
 					statColors+=color;
 				}
 			}
 		}
-	
-	//==========================================Disease=============================================//
-		void Disease(String[] date) throws Exception{
-			JSONArray jsonEvent = getter.getJsonsWithDate("Disease",date[0]+"-"+date[1]+"-"+date[2]);
+	//==========================================Disease===============================================//
+	void Disease(String[] date) throws Exception{
+			JSONArray jsonEvent = getter.getJsonsWithDate("Disease",date[2]+"-"+date[1]+"-"+date[0]);
 			for(int i=0;i<jsonEvent.length();i++) {
-				if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 					countercolorsEvents++;
 					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
 					JSONObject object = new JSONObject();
 				    object.put("level",String.valueOf(3));
 				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-				    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 				    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 				    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 				    object.put("details",jsonEvent.getJSONObject(i).getString("details"));
 				    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-				    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"DiseaseEvent");
+				    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
+				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"DiseaseEvent");
 					statColors+=3;
 				}
 			}
 		}
 		
 	//==========================================Disease=============================================//
-		void Rash(String[] date) throws Exception{
-			JSONArray jsonEvent = getter.getJsonsWithDate("Rash",date[0]+"-"+date[1]+"-"+date[2]);
+	//==========================================Rash==================================================//
+	void Rash(String[] date) throws Exception{
+			JSONArray jsonEvent = getter.getJsonsWithDate("Rash",date[2]+"-"+date[1]+"-"+date[0]);
 			for(int i=0;i<jsonEvent.length();i++)  {
-				if(jsonEvent.getJSONObject(i).getString("level")==null) {
+				if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 					countercolorsEvents++;
 					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
 					JSONObject object = new JSONObject();
 				    object.put("level",String.valueOf(3));
 				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
-				    object.put("eventTime",jsonEvent.getJSONObject(i).getString("eventTime"));
 				    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 				    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 				    object.put("area",jsonEvent.getJSONObject(i).getString("area"));
 				    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-				    object.put("eventId", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
-				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventId"),object,"RashEvent");
+				    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"RashEvent");
 					statColors+=3;
 				}
 			}
@@ -907,6 +897,9 @@ public class Asker {
 
 	//===================time functions==============//
 	//the function check if the time now is between to times
+	
+	//=====================================================================TIMEFunctions======================================================================//
+	//functions the check if the time now is between 2 times
 	boolean checkTime(int starthour,int startmin,int finishhour,int finishmin) { 
 		int hour,min; 
 		String[] time;
@@ -923,6 +916,7 @@ public class Asker {
 	}
 
 	//function that give me the 3 first latter of the name of today 
+	//give the 3 letters of the name of the day today
 	String WhatIsTheDay() throws ParseException { 
 		String timeStamp = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().getTime());
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ENGLISH);
@@ -933,6 +927,7 @@ public class Asker {
 	}
 	
 	//function the give me the date minus the number you give (0 is today)
+	//give the date minus days from today(0 days is today)
 	String[] WhatIsTheDate(int days) {
 		String [] time,sendDate,date,temp;
 		sendDate= new String[6];
@@ -954,6 +949,8 @@ public class Asker {
 	
 	
 	//===================DB function=================//
+	
+	//=====================================================================DBFunctions======================================================================//
 	ResultSet getKids(Connection myConn) throws SQLException {
 		Statement mystmt = myConn.createStatement();
 		String giveMeAllKids= "SELECT * FROM child";
@@ -976,47 +973,5 @@ public class Asker {
 		return events;
 	}
 	
-	JSONArray getJsonsWithDate(String table,String date) throws Exception{	
-		URL	url = new URL("http://127.0.0.1:5000/events/"+ table +"Event/"+date);//+date
-		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-		conn.setRequestMethod("GET");
-		conn.setRequestProperty("Content-Type", "application/json;");
-		StringBuilder response = new StringBuilder();  
-		int HttpResult = conn.getResponseCode(); 
-		if (HttpResult == HttpURLConnection.HTTP_OK) {
-			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			} 
-			in.close();
-		 }
-		JSONObject myResponse = new JSONObject(response.toString());
-		JSONArray jsonarray = myResponse.getJSONArray(table.toLowerCase()+"Event"); 
-		 return jsonarray;
-	}
-
-
-	JSONArray getJsons(String table) throws Exception{	
-	URL	url;
 	
-	url = new URL("http://127.0.0.1:5000/events/"+table+"Events");
-	HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-	conn.setRequestMethod("GET");
-	conn.setRequestProperty("Content-Type", "application/json;");
-	StringBuilder response = new StringBuilder();  
-	int HttpResult = conn.getResponseCode(); 
-	if (HttpResult == HttpURLConnection.HTTP_OK) {
-		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		} 
-		in.close();
-	 }
-	JSONObject myResponse = new JSONObject(response.toString());
-	JSONArray jsonarray = myResponse.getJSONArray("vomitusEvent"); 
-	 return jsonarray;
-	}
-
 }
