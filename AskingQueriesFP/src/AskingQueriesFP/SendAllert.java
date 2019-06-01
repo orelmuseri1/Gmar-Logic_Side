@@ -18,7 +18,7 @@ import org.json.JSONObject;
 public class SendAllert {
 	float counterEvents=0,statColors=0;
 	GetEvent getter=new GetEvent();
-	 String send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String rule) throws Exception{	
+	/* String send(int ID,String Date,String Time,String Level,JSONObject EventsLeading,String Action,String rule) throws Exception{	
 		URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
 		String uniqueID = UUID.randomUUID().toString();
 		JSONObject object = new JSONObject();
@@ -62,11 +62,13 @@ public class SendAllert {
 		
 		
 	}
-	 
-	 String sendLogicAlert(LogicSystemAlert alert) throws Exception{	
-			URL	url = new URL("http://127.0.0.1:5000/alerts/LogicSystemAlert/1"); //  http://127.0.0.1:5000/alerts/LogicSystemAlert/1  https://httpbin.org/post
+	 */
+
+	String sendLogicAlert(LogicSystemAlert alert) throws Exception{	
+			//URL	url = new URL("http://127.0.0.1:5000/alerts/"+alert.getJson().getString("alertID")); //  http://193.106.55.183/alerts/LogicSystemAlert/1  https://httpbin.org/post
+			URL	url = new URL("http://193.106.55.183/alerts/"+alert.getJson().getString("alertID"));
+			//System.out.println("http://193.106.55.183/alerts/"+alert.getJson().getString("alertID"));
 			JSONObject object = alert.getJson();
-		    
 		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/json; charsets=UTF_8"); //  x-www-form-urlencoded   application/json; charsets=UTF_8
@@ -74,9 +76,9 @@ public class SendAllert {
 			conn.setDoOutput(true);
 			conn.setDoInput(true); 
 			conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
-			conn.setChunkedStreamingMode(0);
+			//conn.setChunkedStreamingMode(0);
 			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-			//System.out.println(object.toString());
+			System.out.println(object.toString());
 			wr.write(object.toString());
 			wr.flush();
 			StringBuilder sb = new StringBuilder();  

@@ -1,5 +1,8 @@
 package AskingQueriesFP;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -18,7 +21,13 @@ public class BasicAlert {
 	public BasicAlert(int childID, String level, String alertDate,
 			String actionNeeded,String type) {
 		super();
-		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode());
+		String [] date,temp;
+		final Calendar cal = Calendar.getInstance();
+	    cal.add(Calendar.DATE, 0);
+	    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
+	    temp=dateFormat.format(cal.getTime()).split(",");
+	    date=temp[0].split("/");
+		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+date[0]+date[1]+date[2]);
 		this.childID = childID;
 		this.level = level;
 		AlertDate = alertDate;

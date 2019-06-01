@@ -71,7 +71,6 @@ public class GetEvent {
 
 	JSONArray getKidsJsons() throws Exception{	
 		URL	url;
-		
 		url = new URL("http://193.106.55.183/Child/allAttendedChildren");
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestMethod("GET");
@@ -86,7 +85,7 @@ public class GetEvent {
 			} 
 			in.close();
 		 }
-		System.out.println(response.toString());
+		//System.out.println(response.toString());
 		JSONObject myResponse = new JSONObject(response.toString());
 		JSONArray jsonarray = myResponse.getJSONArray("children"); 
 		 return jsonarray;

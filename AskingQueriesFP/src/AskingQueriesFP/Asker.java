@@ -32,9 +32,10 @@ public class Asker {
 	
 	int ask() throws Exception {
 		int countermsg = 0;
-		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
+		//countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
+			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
 			countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getter.getKidsJsons()); 
 			countermsg += DailyFoodCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
@@ -50,11 +51,42 @@ public class Asker {
 				countermsg += XDaysEgoWaterCheck(getter.getKidsJsons());
 				countermsg += DailyVomitusCheck(2,WhatIsTheDate(0), getter.getKidsJsons());
 				}
-			 }
+			 } 
 		return countermsg;
 		}
 	
 	//=====================================================================Querys=====================================================================//
+	int DailyLessThenCare(String[] today,JSONArray kids,String Table,int amount,String ActionNeeded,String Rule,int level) throws Exception {
+		int value=0,numOfEvents=1,counter = 0;
+		try {
+			JSONArray jsonEvent = getter.getJsonsWithDate("Table",today[2]+"-"+today[1]+"-"+today[0]);
+			for(int j=0;j<kids.length();j++) {		
+				JSONObject object = new JSONObject();// pass all the kids 
+				for(int i=0;i<jsonEvent.length();i++) {
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						amount+= Integer.parseInt(jsonEvent.getJSONObject(i).getString("amount"));
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
+						numOfEvents++;
+					}
+				}
+						if(counter<amount) { 		// if he drink less than he actualy need near to the end of the day
+							try {
+								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),String.valueOf(level),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],ActionNeeded ,object,"3",Rule));
+								value++;
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} // the function that makes the alert
+					}
+						numOfEvents=1;
+				}
+				numOfEvents=1;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return value;
+	}
 	int DailyVomitusCheck(int time ,String[] today,JSONArray kids) throws Exception {
 		int value=0;
 		try {
@@ -69,7 +101,7 @@ public class Asker {
 				JSONObject object = new JSONObject();
 				 for(int i=0;i<jsonEvent.length();i++) {
 						if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 							numOfEvents++;
 							if(jsonEvent.getJSONObject(i).getString("type").equals("פליטה מוגברת"))
 							counterV++;
@@ -118,13 +150,13 @@ public class Asker {
 		int value=0,numOfEvents=1,consumedAmount = 0,amount=0;
 		try {
 			JSONArray jsonEvent = getter.getJsonsWithDate("Water",today[2]+"-"+today[1]+"-"+today[0]);
-			for(int j=0;j<kids.length();j++) {		
+			for(int j=0;j<kids.length();j++) {	
 				JSONObject object = new JSONObject();// pass all the kids 
 				for(int i=0;i<jsonEvent.length();i++) {
 					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
 						consumedAmount+= Integer.parseInt(jsonEvent.getJSONObject(i).getString("consumedAmount"));
 						amount+= Integer.parseInt(jsonEvent.getJSONObject(i).getString("amount"));
-						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 					}
 				}
@@ -189,7 +221,7 @@ public class Asker {
 				 JSONObject object = new JSONObject();
 				 for(int i=0;i<jsonEvent.length();i++) {
 					 if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 							numOfEvents++;
 							if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("finish"))									//checking the amount he drink and sum the amount he drink all day
 								counterWater += jsonEvent.getJSONObject(i).getInt("amount");
@@ -232,7 +264,7 @@ public class Asker {
 				 JSONObject object = new JSONObject();
 				for(int i=0;i<jsonEvent.length();i++) {																			//pass all the events
 					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 						if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
 							counterFood += 1;}
@@ -247,7 +279,7 @@ public class Asker {
 				// need to know what is the real amout of food that need to count
 				for(int i=0;i<jsonEvent2.length();i++) {																			//pass all the events
 					if(jsonEvent2.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 						if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
 							counterFood += 1;}
@@ -303,7 +335,7 @@ public class Asker {
 				JSONObject object = new JSONObject();
 				for(int i=0;i<jsonEvent.length();i++){
 					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {//pass all the events
-						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 							numOfEvents++;
 							if(jsonEvent.getJSONObject(i).getString("amount").equals("חיתול מלא"))	{								//checking the amount he drink and sum the amount he drink all day
 								counterDiapers += 1.2;}
@@ -318,7 +350,7 @@ public class Asker {
 				// need to know what is the real amout of food that need to count
 				for(int i=0;i<jsonEvent2.length();i++) {
 					if(jsonEvent2.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 						if(jsonEvent2.getJSONObject(i).getString("amount").equals("חיתול מלא")) {									//checking the amount he drink and sum the amount he drink all day
 							counterDiapers += 1.0;}
@@ -372,7 +404,7 @@ public class Asker {
 				JSONObject object = new JSONObject();
 				for(int i=0;i<jsonEvent.length();i++) {
 					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 						if(jsonEvent.getJSONObject(i).getString("texture").equals("שלשול/מיימי")) {								
 							counterFeces += 1;}
@@ -413,7 +445,7 @@ public class Asker {
 				JSONObject object = new JSONObject();
 				for(int i=0;i< jsonEvent.length();i++){																			//pass all the events of the kid
 					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
-						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventId"));
+						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 						if(jsonEvent.getJSONObject(i).getString("amount").equals("חיתול מלא"))	{							
 							counterUrine += 1;}
@@ -486,7 +518,7 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("אכל מעבר למנה")) {
 					color= 2;
 				}
-				//sendColorAlert(LiquidFoods.getString("eventId"),"LiquidFood",color);
+				//sendColorAlert(LiquidFoods.getString("eventID"),"LiquidFood",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -517,7 +549,7 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("תולעים")) {
 					color= 3;
 				}
-				//sendColorAlert(Parasites.getString("eventId"),"Parasites",color);
+				//sendColorAlert(Parasites.getString("eventID"),"Parasites",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -546,14 +578,13 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("לח")) {
 					color= 2;
 				}
-				//sendColorAlert(Cough.getString("eventId"),"Cough",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
 			    object.put("childID",jsonEvent.getJSONObject(i).getString("childID"));
 			    object.put("staffID",jsonEvent.getJSONObject(i).getString("staffID"));
 			    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
-			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
+			    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventID")));
 			    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"CoughEvent");
 				statColors+=color;
 			}

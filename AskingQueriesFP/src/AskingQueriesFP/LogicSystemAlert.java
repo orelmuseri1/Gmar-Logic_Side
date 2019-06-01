@@ -42,14 +42,14 @@ public class LogicSystemAlert extends BasicAlert {
 	
 	JSONObject getJson() throws JSONException {
 		JSONObject object = new JSONObject();
+		 object.put("alertID", this.getAlertID());
 	    object.put("alertDate", this.getAlertDate());
 	    object.put("childID",String.valueOf(this.getChildID()));
 	    object.put("level", this.getLevel());
-	    object.put("action_needed",this.getRule());
-	    object.put("alertID", this.getAlertID());
 	    object.put("type", this.getType());
-	    object.put("responsinbleEvents", this.getEventsLeading());
-	    object.put("time_past","");
+	    object.put("timePast","");
+	    object.put("responsibleEvents", this.getEventsLeading());
+	    object.put("actionNeeded",this.getRule());
 	    return object;
 		
 	}
