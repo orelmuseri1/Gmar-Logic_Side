@@ -8,7 +8,7 @@ public class LogicSystemAlert extends BasicAlert {
 	String type;
 	String rule;
 	public LogicSystemAlert(int childID, String level, String alertDate, String actionNeeded,JSONObject eventsLeading,String type,String rule) {
-		super(childID, level,alertDate, actionNeeded);
+		super(childID, level,alertDate, actionNeeded,type);
 		this.rule=rule;
 		this.type=type;
 		this.eventsLeading=eventsLeading;

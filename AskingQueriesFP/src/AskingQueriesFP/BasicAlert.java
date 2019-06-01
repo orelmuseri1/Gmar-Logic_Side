@@ -12,16 +12,18 @@ public class BasicAlert {
 	String AlertDate;
 	String alertID;
 	String  actionNeeded;
+	String type;
 	JSONObject EventsLeading;
 	//constrctor
 	public BasicAlert(int childID, String level, String alertDate,
-			String actionNeeded) {
+			String actionNeeded,String type) {
 		super();
-		String uniqueID = UUID.randomUUID().toString();
+		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode());
 		this.childID = childID;
 		this.level = level;
 		AlertDate = alertDate;
 		this.alertID = uniqueID;
+		this.type=type;
 		this.actionNeeded = actionNeeded;
 	};
 	

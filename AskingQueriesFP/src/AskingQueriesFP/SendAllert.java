@@ -139,6 +139,7 @@ public class SendAllert {
 
 	// sent put that Change the event color
 	int sendPutColor(String ID, JSONObject object,String table) throws Exception{	
+			//URL	url = new URL("http://127.0.0.1:5000/events/"+table+"/"+ID); 
 			URL	url = new URL("http://193.106.55.183/events/"+table+"/"+ID); 
 		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("PUT");
