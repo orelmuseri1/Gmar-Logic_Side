@@ -11,7 +11,6 @@ import org.json.JSONObject;
 public class BasicAlert {
 	int childID;
 	String level;
-	String AlertTime;
 	String AlertDate;
 	String alertID;
 	String  actionNeeded;
@@ -21,19 +20,14 @@ public class BasicAlert {
 	public BasicAlert(int childID, String level, String alertDate,
 			String actionNeeded,String type) {
 		super();
-		String [] date,temp;
-		final Calendar cal = Calendar.getInstance();
-	    cal.add(Calendar.DATE, 0);
-	    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
-	    temp=dateFormat.format(cal.getTime()).split(",");
-	    date=temp[0].split("/");
-		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+date[0]+date[1]+date[2]);
 		this.childID = childID;
 		this.level = level;
 		AlertDate = alertDate;
+		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+AlertDate.hashCode());
 		this.alertID = uniqueID;
 		this.type=type;
 		this.actionNeeded = actionNeeded;
+		
 	};
 	
 	//Getters & Setters
