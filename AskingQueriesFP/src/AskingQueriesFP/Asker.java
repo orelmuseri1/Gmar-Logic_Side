@@ -32,8 +32,7 @@ public class Asker {
 	
 	int ask() throws Exception {
 		int countermsg = 0;
-		countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
-		//countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
+		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
@@ -111,13 +110,13 @@ public class Asker {
 					}
 				if(time==1) {
 					if(counterV==2) {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
 						numOfAlerts++;
 						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
 						value++;
 					}
 					if(counterV>2) {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
 						value++;
 						numOfAlerts++;
 						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
@@ -125,7 +124,7 @@ public class Asker {
 				}
 				else if(time==2) {
 					if(counterV>3) {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
 						value++;
 						numOfAlerts++;
 						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
@@ -164,7 +163,7 @@ public class Asker {
 					if(consumedAmount!=0) {
 						if(amount/consumedAmount<0.75) { 		// if he drink less than he actualy need near to the end of the day
 							try {
-								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום"));
+								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום"));
 								value++;
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
@@ -173,7 +172,7 @@ public class Asker {
 						}
 					}else {
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"1","הילד לא שתה היום"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"1","הילד לא שתה היום"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -185,7 +184,7 @@ public class Asker {
 					if(consumedAmount!=0) {
 						if(amount/consumedAmount<0.3) { 		// if he drink less than he actualy need in the half of the day
 							try {
-								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום"));
+								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום"));
 								value++;
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
@@ -194,7 +193,7 @@ public class Asker {
 						}
 					}else {
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"1","הילד לא שתה היום"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"1","הילד לא שתה היום"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -235,7 +234,7 @@ public class Asker {
 				 }
 					if(counterWater<1400) { 		// if he drink less than he actualy need near to the end of the day
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום בימים האחרונים")); // the function that makes the alert
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום בימים האחרונים")); // the function that makes the alert
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -294,7 +293,7 @@ public class Asker {
 				if(time == 1) {
 					if(counterFood< 0.5) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "הילד לא אכל היום מספיק!",object,"3","הילד לא אכל את הכמות המומלצת היום"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא אכל היום מספיק!",object,"3","הילד לא אכל את הכמות המומלצת היום"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -306,7 +305,7 @@ public class Asker {
 				if(time == 2) {
 					if(counterFood< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "הילד לא אכל היום מספיק!",object,"3","הילד לא אכל את הכמות המומלצת היום"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא אכל היום מספיק!",object,"3","הילד לא אכל את הכמות המומלצת היום"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -365,7 +364,7 @@ public class Asker {
 				if(time == 1) {
 					if(counterDiapers< 1.0) { 		// if he ate less than he actually need near to the end of the day
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "כמות הצואה/שתן קטנה",object,"3","אירוע חוזר של אי עשיית צואה"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "כמות הצואה/שתן קטנה",object,"3","אירוע חוזר של אי עשיית צואה"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -375,7 +374,7 @@ public class Asker {
 				}else if(time == 2) {
 					if(counterDiapers< 1.5) { 	
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "כמות הצואה/שתן קטנה",object,"3","אירוע חוזר של אי עשיית צואה"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "כמות הצואה/שתן קטנה",object,"3","אירוע חוזר של אי עשיית צואה"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -412,7 +411,7 @@ public class Asker {
 				}
 				if(counterFeces>=3) { 
 					try {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"3","כמות חריגה של שלשול"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","כמות חריגה של שלשול"));
 						numOfAlerts++;
 						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getInt("childID"));
 						value++;
@@ -423,7 +422,7 @@ public class Asker {
 				counterFeces=0;
 				numOfEvents=1;
 				if(numOfAlerts>3) {
-					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"3","כמות חריגה של שלשול"));
+					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","כמות חריגה של שלשול"));
 					}
 			}
 		} catch (SQLException e) {
@@ -459,7 +458,7 @@ public class Asker {
 				}
 				if(counterUrine< 1.0) { 	
 					try {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לתת לילד מים",object,"3","כמות שתן קטנה בימים האחרונים"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"/-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","כמות שתן קטנה בימים האחרונים"));
 						value++;
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -609,12 +608,22 @@ public class Asker {
 				if(color!=3) {
 					if(jsonEvent.getJSONObject(i).getString("color").equals("אדום/ורוד")) {
 						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
+						JSONObject object=new JSONObject();
+						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול"));
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("אדום בוהק")) {
 						color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
+						JSONObject object=new JSONObject();
+						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול"));
+					
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("לבן אפור/חיוורת בצבע חימר")) {
-						color= 3;
+						color= 3;	
+						JSONObject object=new JSONObject();
+						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","בעיה בייצור מלחי מרה/תפקוד כיס המרה"));
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("חום בהיר")) {
 						color= 2;
@@ -628,7 +637,6 @@ public class Asker {
 						color= 2; //אלא אם הוא אכל מזונות אדומים למשל סלק
 						}				
 				}
-				//sendColorAlert(Feces.getString("eventId"),"Feces",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -916,7 +924,6 @@ public class Asker {
 			for(int i=0;i<jsonEvent.length();i++)  {
 				if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 					countercolorsEvents++;
-					//sendColorAlert(Rash.getString("eventId"),"Rash",3);
 					JSONObject object = new JSONObject();
 				    object.put("level",String.valueOf(3));
 				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -926,7 +933,7 @@ public class Asker {
 				    object.put("type",jsonEvent.getJSONObject(i).getString("type"));
 				    object.put("eventID", String.valueOf(jsonEvent.getJSONObject(i).getString("eventId")));
 				    sender.sendPutColor(jsonEvent.getJSONObject(i).getString("eventID"),object,"RashEvent");
-					statColors+=3;
+				   statColors+=3;
 				}
 			}
 		}

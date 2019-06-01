@@ -67,7 +67,6 @@ public class SendAllert {
 	String sendLogicAlert(LogicSystemAlert alert) throws Exception{	
 			//URL	url = new URL("http://127.0.0.1:5000/alerts/"+alert.getJson().getString("alertID")); //  http://193.106.55.183/alerts/LogicSystemAlert/1  https://httpbin.org/post
 			URL	url = new URL("http://193.106.55.183/alerts/"+alert.getJson().getString("alertID"));
-			//System.out.println("http://193.106.55.183/alerts/"+alert.getJson().getString("alertID"));
 			JSONObject object = alert.getJson();
 		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("POST");
