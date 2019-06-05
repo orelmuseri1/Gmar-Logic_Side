@@ -36,7 +36,9 @@ public class Asker {
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
-			countermsg += DailyCheckMoreThenEventWithParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",3,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
+			countermsg += DailyCheckMoreThenEventWithIntParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה עד חום בהיר");
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",2,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
@@ -46,7 +48,9 @@ public class Asker {
 		if(checkTime(FINELHOUR,FINELMIN,FINELHOUR,FINELMIN+3)) {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
-			countermsg += DailyCheckMoreThenEventWithParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",3,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה עד חום בהיר");
+			countermsg += DailyCheckMoreThenEventWithIntParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",2,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
 			countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getter.getKidsJsons());
@@ -56,7 +60,7 @@ public class Asker {
 			countermsg += DailyTypeDiaperCheck(WhatIsTheDate(0),getter.getKidsJsons());
 			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
 				countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",5,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת בימים האחרונים","3","3",3);
-				countermsg += DailyCheckMoreThenEventWithParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",3,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום בימים האחרונים","3","3",3,"tempreture",38);
+				countermsg += DailyCheckMoreThenEventWithIntParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",3,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום בימים האחרונים","3","3",3,"tempreture",38);
 				countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",5,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול בימים האחרונים","3","3",3);
 				countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",4,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה בימים האחרונים","3","3",3);
 				countermsg += XDaysEgoUrineDiaperCheck(getter.getKidsJsons());
@@ -119,7 +123,7 @@ public class Asker {
 		}
 		return value;
 	}
-	int DailyCheckMoreThenEventWithParm(String[] today,JSONArray kids,String Table,int amount,String ActionNeeded,String Rule,String level,String type,int days,String parm,int parmValue) throws Exception {
+	int DailyCheckMoreThenEventWithStringParm(String[] today,JSONArray kids,String Table,int amount,String ActionNeeded,String Rule,String level,String type,int days,String parm,String parmValue) throws Exception {
 		int value=0,numOfEvents=1,counter = 0;
 		try {
 			JSONArray jsonEvent;
@@ -127,7 +131,46 @@ public class Asker {
 			 jsonEvent = getter.getJsonsWithDate(Table,today[2]+"-"+today[1]+"-"+today[0]);
 			if(days>1) {
 			 for(int k=1;k<days;k++) {
-				 jsonEvent.put(getter.getJsonsWithDate("Fever",WhatIsTheDate(k)[2]+"-"+WhatIsTheDate(k)[1]+"-"+WhatIsTheDate(k)[0]));
+				 jsonEvent.put(getter.getJsonsWithDate(Table,WhatIsTheDate(k)[2]+"-"+WhatIsTheDate(k)[1]+"-"+WhatIsTheDate(k)[0]));
+					}
+			}
+			for(int j=0;j<kids.length();j++) {		
+				JSONObject object = new JSONObject();// pass all the kids 
+				for(int i=0;i<jsonEvent.length();i++) {
+					if(jsonEvent.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
+						if(jsonEvent.getJSONObject(i).getString(parm).equals(parmValue)) {
+							object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
+							numOfEvents++;
+							counter++;
+						}
+					}
+				}	
+				if(counter>amount) { 		// if he drink less than he actualy need near to the end of the day
+				try {
+					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],ActionNeeded ,object,type,Rule));
+					value++;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					} // the function that makes the alert
+				}
+				numOfEvents=1;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return value;
+	}
+	int DailyCheckMoreThenEventWithIntParm(String[] today,JSONArray kids,String Table,int amount,String ActionNeeded,String Rule,String level,String type,int days,String parm,int parmValue) throws Exception {
+		int value=0,numOfEvents=1,counter = 0;
+		try {
+			JSONArray jsonEvent;
+
+			 jsonEvent = getter.getJsonsWithDate(Table,today[2]+"-"+today[1]+"-"+today[0]);
+			if(days>1) {
+			 for(int k=1;k<days;k++) {
+				 jsonEvent.put(getter.getJsonsWithDate(Table,WhatIsTheDate(k)[2]+"-"+WhatIsTheDate(k)[1]+"-"+WhatIsTheDate(k)[0]));
 					}
 			}
 			for(int j=0;j<kids.length();j++) {		
@@ -724,13 +767,13 @@ public class Asker {
 						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
 						JSONObject object=new JSONObject();
 						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("אדום בוהק")) {
 						color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
 						JSONObject object=new JSONObject();
 						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
 					
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("לבן אפור/חיוורת בצבע חימר")) {
@@ -740,7 +783,9 @@ public class Asker {
 						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","בעיה בייצור מלחי מרה/תפקוד כיס המרה"));
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("חום בהיר")) {
-						color= 2;
+						if(jsonEvent.getJSONObject(i).getString("texture").equals("שילשול/מיימי"))
+							color=3;
+						else color= 2;
 					}
 				}
 				if(color!=3) {
