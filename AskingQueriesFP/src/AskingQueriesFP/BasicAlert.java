@@ -1,10 +1,5 @@
 package AskingQueriesFP;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.UUID;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
