@@ -36,11 +36,11 @@ public class Asker {
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
-			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",3,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",2,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
 			countermsg += DailyCheckMoreThenEventWithIntParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
 			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה עד חום בהיר");
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
-			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",2,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
+			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",1,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
 			countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getter.getKidsJsons()); 
 			countermsg += DailyFoodCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
