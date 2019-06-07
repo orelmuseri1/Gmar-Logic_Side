@@ -700,13 +700,13 @@ public class Asker {
 				if(jsonEvent.getJSONObject(i).getString("type").equals("כינים")) {
 					color = 3;
 					JSONObject eventsLeading=new JSONObject();
-					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
+					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
 					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","קיימת חשש לבעיית כיניים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("תולעים")) {
 					color= 3;
 					JSONObject eventsLeading=new JSONObject();
-					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
+					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
 					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				JSONObject object = new JSONObject();
@@ -1035,7 +1035,6 @@ public class Asker {
 			for(int i=0;i<jsonEvent.length();i++) {
 				if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 					countercolorsEvents++;
-					//sendColorAlert(Disease.getString("eventId"),"Disease",3);
 					JSONObject object = new JSONObject();
 				    object.put("level",String.valueOf(3));
 				    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
