@@ -13,15 +13,16 @@ public class BasicAlert {
 	JSONObject EventsLeading;
 	//constrctor
 	public BasicAlert(int childID, String level, String alertDate,
-			String actionNeeded,String type) {
+			String actionNeeded,String type,JSONObject EventsLeading) {
 		super();
 		this.childID = childID;
 		this.level = level;
 		AlertDate = alertDate;
-		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+AlertDate.hashCode());
-		this.alertID = uniqueID;
 		this.type=type;
 		this.actionNeeded = actionNeeded;
+		this.EventsLeading=EventsLeading;
+		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+AlertDate.hashCode()+EventsLeading.hashCode());
+		this.alertID = uniqueID;
 		
 	};
 	
@@ -65,6 +66,21 @@ public class BasicAlert {
 		public void setActionNeeded(String actionNeeded) {
 			this.actionNeeded = actionNeeded;
 		};
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public JSONObject getEventsLeading() {
+			return EventsLeading;
+		}
+
+		public void setEventsLeading(JSONObject eventsLeading) {
+			EventsLeading = eventsLeading;
+		}
 
 		
 		JSONObject getJson() throws JSONException {
@@ -77,6 +93,7 @@ public class BasicAlert {
 		    return object;
 			
 		}
+
 
 
 }

@@ -4,32 +4,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LogicSystemAlert extends BasicAlert {
-	JSONObject eventsLeading;
-	String type;
 	String rule;
 	public LogicSystemAlert(int childID, String level, String alertDate, String actionNeeded,JSONObject eventsLeading,String type,String rule) {
-		super(childID, level,alertDate, actionNeeded,type);
+		super(childID, level,alertDate, actionNeeded,type,eventsLeading);
 		this.rule=rule;
-		this.type=type;
-		this.eventsLeading=eventsLeading;
+
 	}
 	
 
-	public JSONObject getEventsLeading() {
-		return eventsLeading;
-	}
-
-	public void setEventsLeading(JSONObject eventsLeading) {
-		this.eventsLeading = eventsLeading;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
 
 	public String getRule() {
 		return rule;
