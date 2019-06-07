@@ -22,7 +22,7 @@ public class GetEvent {
 		if (HttpResult == HttpURLConnection.HTTP_OK) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
+			while ((inputLine = in.readLine()) != null) { 
 				response.append(inputLine);
 			} 
 			in.close();

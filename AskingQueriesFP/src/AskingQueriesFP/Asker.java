@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,14 +31,13 @@ public class Asker {
 	
 	int ask() throws Exception {
 		int countermsg = 0;
-		countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה עד חום בהיר");
 		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
 			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",2,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
 			countermsg += DailyCheckMoreThenEventWithDoubleParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
-			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה עד חום בהיר");
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה/חום");
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",1,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),1,getter.getKidsJsons());
@@ -50,7 +48,7 @@ public class Asker {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
 			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",3,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
-			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה עד חום בהיר");
+			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Urine",2,"לתת לילד מים","אירועים חוזרים של שתן כהה היום","2","3",1,"color","צהוב כהה/חום");
 			countermsg += DailyCheckMoreThenEventWithDoubleParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",1,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום היום","3","3",1,"tempreture",38);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",2,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
@@ -58,7 +56,6 @@ public class Asker {
 			countermsg += DailyDiaperCheck(WhatIsTheDate(0),2,getter.getKidsJsons());
 			countermsg += DailyWaterCheck(2,WhatIsTheDate(0),getter.getKidsJsons());
 			countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getter.getKidsJsons());
-			countermsg += DailyTypeDiaperCheck(WhatIsTheDate(0),getter.getKidsJsons());
 			if(!WhatIsTheDay().equals("Mon")||!WhatIsTheDay().equals("Sun")) {
 				countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",5,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת בימים האחרונים","3","3",3);
 				countermsg += DailyCheckMoreThenEventWithDoubleParm(WhatIsTheDate(0),getter.getKidsJsons(),"Fever",3,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של חום בימים האחרונים","3","3",3,"tempreture",38);
@@ -96,7 +93,7 @@ public class Asker {
 				}
 				if(counter>amount) { 
 					try {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיים חשש שהילד מפתח מחלה" ,object,"3","אירועים חוזרים של חום במידה מועטה חריג בימים האחרונים"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיים חשש שהילד מפתח מחלה" ,object,"3","אירועים חוזרים של חום במידה מועטה חריג בימים האחרונים"));
 						value++;
 						for(int i=0;i<object.length();i++){
 							JSONObject event=getter.getJsonsByID("fever",object.getString(String.valueOf(i+1)));
@@ -149,7 +146,7 @@ public class Asker {
 				}	
 				if(counter>amount) { 		// if he drink less than he actualy need near to the end of the day
 				try {
-					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],ActionNeeded ,object,type,Rule));
+					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000",ActionNeeded ,object,type,Rule));
 					value++;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -187,7 +184,7 @@ public class Asker {
 				}	
 				if(counter>amount) { 		// if he drink less than he actualy need near to the end of the day
 				try {
-					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],ActionNeeded ,object,type,Rule));
+					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000",ActionNeeded ,object,type,Rule));
 					value++;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -195,6 +192,7 @@ public class Asker {
 					} // the function that makes the alert
 				}
 				numOfEvents=1;
+				counter=0;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -226,7 +224,7 @@ public class Asker {
 				}	
 				if(counter>amount) { 		// if he drink less than he actualy need near to the end of the day
 				try {
-					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],ActionNeeded ,object,type,Rule));
+					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000",ActionNeeded ,object,type,Rule));
 					value++;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -263,7 +261,7 @@ public class Asker {
 				}	
 				if(counter>amount) { 		
 				try {
-					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],ActionNeeded ,object,type,Rule));
+					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),level,WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000",ActionNeeded ,object,type,Rule));
 					value++;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -328,7 +326,7 @@ public class Asker {
 			if(numOfAlerts>3) {
 				JSONObject kidsAlerts = new JSONObject();
 				kidsAlerts.put("alerts", counetrAlerts);
-				sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5], "לבדוק את האוכל שהוגש היום לאותם ילדים",object,"3","מספר חריג של ילדים הקיאו היום"));
+				sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לבדוק את האוכל שהוגש היום לאותם ילדים",object,"3","מספר חריג של ילדים הקיאו היום"));
 				}
 			}
 		} catch (SQLException e) {
@@ -346,13 +344,14 @@ public class Asker {
 				for(int i=0;i<jsonEvent.length();i++) {
 					if(jsonEvent.getJSONObject(i).getString("childID").equals(kids.getJSONObject(j).getString("childID"))) {
 						consumedAmount+= Integer.parseInt(jsonEvent.getJSONObject(i).getString("consumedAmount"));
-						amount+= Integer.parseInt(jsonEvent.getJSONObject(i).getString("amount"));
+						amount+= 100;//Integer.parseInt(jsonEvent.getJSONObject(i).getString("amount"));
 						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
 					}
 				}
 				if(time == 1) {
-					if(consumedAmount!=0) {
+					
+					if(consumedAmount!=0 &&amount!=0) {
 						if(amount/consumedAmount<0.75) { 		// if he drink less than he actualy need near to the end of the day
 							try {
 								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום"));
@@ -362,7 +361,7 @@ public class Asker {
 								e.printStackTrace();
 							} // the function that makes the alert
 						}
-					}else if (numOfEvents>1){
+					}else{
 						try {
 							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"1","הילד לא שתה היום"));
 							value++;
@@ -457,14 +456,13 @@ public class Asker {
 					if(jsonEvent.getJSONObject(i).getString("childID").equals(kids.getJSONObject(j).getString("childID"))) {
 						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
-						if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
+						if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("סיים מנה"))	{								//checking the amount he drink and sum the amount he drink all day
 							counterFood += 1;}
-						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("more than half")) {
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעל חצי מנה")) {
 							counterFood += 0.6;}
-						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("less than half")) {
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי מנה")) {
 							counterFood += 0.4;}
-						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("nothing")) {
-							counterFood += 0;}					
+				
 					}
 				}
 				// need to know what is the real amout of food that need to count
@@ -472,14 +470,12 @@ public class Asker {
 					if(jsonEvent2.getJSONObject(i).getString("childID")==kids.getJSONObject(j).getString("childID")) {
 						object.put(String.valueOf(numOfEvents), jsonEvent2.getJSONObject(i).getString("eventID"));
 						numOfEvents++;
-						if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("finish"))	{								//checking the amount he drink and sum the amount he drink all day
+						if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("סיים מנה"))	{								//checking the amount he drink and sum the amount he drink all day
 							counterFood += 1;}
-						else if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("more than half")) {
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעל חצי מנה")) {
 							counterFood += 0.6;}
-						else if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("less than half")) {
-							counterFood += 0.4;}
-						else if(jsonEvent2.getJSONObject(i).getString("consumedAmount").equals("nothing")) {
-							counterFood += 0;}					
+						else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי מנה")) {
+							counterFood += 0.4;}			
 					}
 				}
 				if(time == 1) {
@@ -530,12 +526,10 @@ public class Asker {
 							numOfEvents++;
 							if(jsonEvent.getJSONObject(i).getString("amount").equals("חיתול מלא"))	{								//checking the amount he drink and sum the amount he drink all day
 								counterDiapers += 1.2;}
-							else if(jsonEvent.getJSONObject(i).getString("amount").equals("כמות רגילה")) {
+							else if(jsonEvent.getJSONObject(i).getString("amount").equals("רגילה")) {
 								counterDiapers += 0.7;}
-							else if(jsonEvent.getJSONObject(i).getString("amount").equals("כמות קטנה")) {
-								counterDiapers += 0.5;}
-							else if(jsonEvent.getJSONObject(i).getString("amount").equals("ללא")) {
-								counterDiapers += 0.1;}					
+							else if(jsonEvent.getJSONObject(i).getString("amount").equals("קטנה")) {
+								counterDiapers += 0.5;}				
 					}
 				}
 				// need to know what is the real amout of food that need to count
@@ -545,12 +539,10 @@ public class Asker {
 						numOfEvents++;
 						if(jsonEvent2.getJSONObject(i).getString("amount").equals("חיתול מלא")) {									//checking the amount he drink and sum the amount he drink all day
 							counterDiapers += 1.0;}
-						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("כמות רגילה")) {
+						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("רגילה")) {
 							counterDiapers += 0.6;}
-						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("כמות קטנה")) {
+						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("קטנה")) {
 							counterDiapers += 0.4;}
-						else if(jsonEvent2.getJSONObject(i).getString("amount").equals("ללא")) {
-							counterDiapers += 0;}
 						}
 					}
 				if(time == 1) {
@@ -585,44 +577,6 @@ public class Asker {
 	}
 	
 	//function that get time of start and the end and check if now is between  them
-	int DailyTypeDiaperCheck(String[] today,JSONArray kids) throws Exception{
-		int value=0,numOfEvents=1,numOfAlerts=0;
-		JSONObject counetrAlerts = new JSONObject();
-		try {
-			float counterFeces = 0;
-			JSONArray jsonEvent = getter.getJsonsWithDate("Feces",today[2]+"-"+today[1]+"-"+today[0]);
-			for(int j=0;j<kids.length();j++) {																		
-				JSONObject object = new JSONObject();
-				for(int i=0;i<jsonEvent.length();i++) {
-					if(jsonEvent.getJSONObject(i).getString("childID").equals(kids.getJSONObject(j).getString("childID"))) {
-						object.put(String.valueOf(numOfEvents), jsonEvent.getJSONObject(i).getString("eventID"));
-						numOfEvents++;
-						if(jsonEvent.getJSONObject(i).getString("texture").equals("שלשול/מיימי")) {								
-							counterFeces += 1;}
-					}
-				}
-				if(counterFeces>=3) { 
-					try {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","כמות חריגה של שלשול"));
-						numOfAlerts++;
-						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getInt("childID"));
-						value++;
-					} catch (Exception e) {
-						e.printStackTrace();
-						}
-					}
-				counterFeces=0;
-				numOfEvents=1;
-				if(numOfAlerts>3) {
-					sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","כמות חריגה של שלשול"));
-					}
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return value;
-	}
 
 	//function that check the amount of urine in cople days ego
 	int XDaysEgoUrineDiaperCheck(JSONArray kids) throws Exception{
@@ -739,13 +693,13 @@ public class Asker {
 					color = 3;
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיית כיניים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","קיימת חשש לבעיית כיניים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("תולעים")) {
 					color= 3;
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
@@ -797,43 +751,32 @@ public class Asker {
 			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
 				countercolorsEvents++;
 				color=1;
-				if(jsonEvent.getJSONObject(i).getString("texture").equals("רירי")) {
+				if(jsonEvent.getJSONObject(i).getString("texture").equals("ריירי")) {
 					color = 3;
 				}
 				else if(jsonEvent.getJSONObject(i).getString("texture").equals("שילשול/מיימי ")) {
 					color = 2;
 				}
 				if(color!=3) {
-					if(jsonEvent.getJSONObject(i).getString("color").equals("אדום/ורוד")) {
-						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
-						JSONObject object=new JSONObject();
-						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
-					}
-					else if(jsonEvent.getJSONObject(i).getString("color").equals("אדום בוהק")) {
+					if(jsonEvent.getJSONObject(i).getString("color").equals("אדום")) {
 						color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
 						JSONObject object=new JSONObject();
-						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
+						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
 					
 					}
-					else if(jsonEvent.getJSONObject(i).getString("color").equals("לבן אפור/חיוורת בצבע חימר")) {
+					else if(jsonEvent.getJSONObject(i).getString("color").equals("לבן אפור")) {
 						color= 3;	
 						JSONObject object=new JSONObject();
-						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","בעיה בייצור מלחי מרה/תפקוד כיס המרה"));
-					}
-					else if(jsonEvent.getJSONObject(i).getString("color").equals("חום בהיר")) {
-						if(jsonEvent.getJSONObject(i).getString("texture").equals("שילשול/מיימי"))
-							color=3;
-						else color= 2;
+						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","בעיה בייצור מלחי מרה/תפקוד כיס המרה"));
 					}
 				}
 				if(color!=3) {
-					if(jsonEvent.getJSONObject(i).getString("amount").equals("ללא")) {
+					if(jsonEvent.getJSONObject(i).getString("amount").equals("קטנה")) {
 						color= 3; //אלא אם הוא אכל מזונות אדומים למשל סלק
 					}
-					else if(jsonEvent.getJSONObject(i).getString("amount").equals("מריחה/כמות קטנה ")) {
+					else if(jsonEvent.getJSONObject(i).getString("amount").equals("רגילה")) {
 						color= 2; //אלא אם הוא אכל מזונות אדומים למשל סלק
 						}				
 				}
@@ -870,7 +813,6 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("נזלת")) {
 					color = 3;
 				}
-				//sendColorAlert(Secretion.getString("eventId"),"Secretion",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -982,7 +924,6 @@ public class Asker {
 						color= 2;
 					}	
 				}
-				//sendColorAlert(Urine.getString("eventId"),"Urine",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -1010,7 +951,7 @@ public class Asker {
 				if(jsonEvent.getJSONObject(i).getString("sleepingScope").equals("אי שינה")) {
 					color= 3; 
 				}
-				else if(jsonEvent.getJSONObject(i).getString("sleepingScope").equals("שינה חלקית לא שקטה")) {
+				else if(jsonEvent.getJSONObject(i).getString("sleepingScope").equals("שינה חלקית")) {
 					color= 2; 
 				}
 				JSONObject object = new JSONObject();
@@ -1042,18 +983,18 @@ public class Asker {
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
 					System.out.println();
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"להלביש את הילד/לכסות אותו",eventsLeading,"3","טמפרטורה מתחת לטווח תקין"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","להלביש את הילד/לכסות אותו",eventsLeading,"3","טמפרטורה מתחת לטווח תקין"));
 				}
 				else if(Double.parseDouble(jsonEvent.getJSONObject(i).getString("tempreture"))<=38 && Double.parseDouble(jsonEvent.getJSONObject(i).getString("tempreture"))>=37.5) { 
 					JSONObject eventsLeading=new JSONObject();
-					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(2),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"יש למדוד את חום הילד שוב בעוד כשעתיים",eventsLeading,"3","טמפרטורה קצת מעל לטווח תקין"));
+					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(2),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","יש למדוד את חום הילד שוב בעוד כשעתיים",eventsLeading,"3","טמפרטורה קצת מעל לטווח תקין"));
 				}
 				else if(Double.parseDouble(jsonEvent.getJSONObject(i).getString("tempreture"))>38.0) {
 					color= 3; 
 					JSONObject eventsLeading=new JSONObject();
-					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+", "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"עדכון הורים להגיע לאסוף",eventsLeading,"3","טמפרטורה מעל לטווח תקין"));
+					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","עדכון הורים להגיע לאסוף",eventsLeading,"3","טמפרטורה מעל לטווח תקין"));
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);

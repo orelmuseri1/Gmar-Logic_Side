@@ -87,8 +87,6 @@ public class SendAllert {
 					  }
 				br.close();
 
-				JSONObject myResponse = new JSONObject(sb.toString());
-				System.out.println(myResponse); 
 					} else {
 					    System.out.println(conn.getResponseMessage());  
 					}  
@@ -160,8 +158,8 @@ public class SendAllert {
 					  }
 				br.close();
 
-				JSONObject myResponse = new JSONObject(sb.toString());
-				System.out.println(myResponse);
+				/*JSONObject myResponse = new JSONObject(sb.toString());
+				System.out.println(myResponse);*/
 					} else {
 					    System.out.println(conn.getResponseMessage());  
 					}

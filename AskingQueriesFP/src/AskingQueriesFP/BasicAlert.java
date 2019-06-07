@@ -1,5 +1,9 @@
 package AskingQueriesFP;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,13 +19,19 @@ public class BasicAlert {
 	public BasicAlert(int childID, String level, String alertDate,
 			String actionNeeded,String type,JSONObject EventsLeading) {
 		super();
+		String[] temp,date;
+		final Calendar cal = Calendar.getInstance();
+	    cal.add(Calendar.DATE, 0);
+	    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy,HH:mm:ss");
+	    temp=dateFormat.format(cal.getTime()).split(",");
+	    date=temp[0].split("/");
 		this.childID = childID;
 		this.level = level;
 		AlertDate = alertDate;
 		this.type=type;
 		this.actionNeeded = actionNeeded;
 		this.EventsLeading=EventsLeading;
-		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+AlertDate.hashCode()+EventsLeading.hashCode());
+		String uniqueID = String.valueOf(childID+level.hashCode()+actionNeeded.hashCode()+date[0].hashCode()+date[1].hashCode()+date[2].hashCode()+EventsLeading.toString().hashCode());
 		this.alertID = uniqueID;
 		
 	};
