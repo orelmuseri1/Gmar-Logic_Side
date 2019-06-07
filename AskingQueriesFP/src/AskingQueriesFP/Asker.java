@@ -32,6 +32,14 @@ public class Asker {
 	int ask() throws Exception {
 		int countermsg = 0;
 		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
+		countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getter.getKidsJsons());
+		countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getter.getKidsJsons());
+		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
+		countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
+		countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getter.getKidsJsons()); 
+		countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",2,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
+		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
+		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",1,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
 		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
@@ -372,7 +380,7 @@ public class Asker {
 					}
 				}
 				else if(time == 2) {
-					if(consumedAmount!=0) {
+					if(consumedAmount!=0&&amount!=0) {
 						if(amount/consumedAmount<0.3) { 		// if he drink less than he actualy need in the half of the day
 							try {
 								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "הילד לא שותה מספיק מים !",object,"3","הילד לא שתה את הכמות המומלצת היום"));
@@ -624,6 +632,7 @@ public class Asker {
 	
 	//=====================================================================ColorsQuerys===============================================================//
 	//the function that call all the colors querys
+	
 	float checkColorsAlerts(String[] date) throws Exception {
 		LiquidFoods(date);
 		Parasites(date);
