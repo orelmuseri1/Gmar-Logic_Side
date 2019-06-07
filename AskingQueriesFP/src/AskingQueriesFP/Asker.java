@@ -322,7 +322,7 @@ public class Asker {
 				}
 				else if(time==2) {
 					if(counterV>3) {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לתת לילד מים",object,"3","מספר חריג חוזר של הקאות או פליטות"));
 						value++;
 						numOfAlerts++;
 						counetrAlerts.put(String.valueOf(numOfAlerts), kids.getJSONObject(j).getString("childID"));
@@ -334,7 +334,7 @@ public class Asker {
 			if(numOfAlerts>3) {
 				JSONObject kidsAlerts = new JSONObject();
 				kidsAlerts.put("alerts", counetrAlerts);
-				sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לבדוק את האוכל שהוגש היום לאותם ילדים",object,"3","מספר חריג של ילדים הקיאו היום"));
+				sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000", "לבדוק את האוכל שהוגש היום לאותם ילדים",object,"3","מספר חריג של ילדים הקיאו היום"));
 				}
 			}
 		} catch (SQLException e) {
@@ -688,8 +688,7 @@ public class Asker {
 			}
 		}
 	}
-	
-	//=======================================Parasites============================================//
+
 	//==========================================Parasites=============================================//
 	void Parasites(String[] date) throws Exception {
 		int color=1;
@@ -702,13 +701,13 @@ public class Asker {
 					color = 3;
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","קיימת חשש לבעיית כיניים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","קיימת חשש לבעיית כיניים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("תולעים")) {
 					color= 3;
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventId"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
@@ -722,8 +721,6 @@ public class Asker {
 			}
 		}	
 	}
-	
-	//=========================================Cough==============================================//
 	//==========================================Cough=================================================//
 	void Cough(String[] date) throws Exception {
 		int color =1;
@@ -750,8 +747,6 @@ public class Asker {
 			}
 		}
 	}
-	
-	//=========================================Feces==============================================//
 	//==========================================Feces=================================================//
 	void Feces(String[] date) throws Exception {
 		int color =1;
@@ -771,14 +766,14 @@ public class Asker {
 						color= 3;//אלא אם אכל מזונות אדומים למשל סלק 
 						JSONObject object=new JSONObject();
 						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","דימום מע' עיכול (אלא אם אכל מזונות בצבע אדום)"));
 					
 					}
 					else if(jsonEvent.getJSONObject(i).getString("color").equals("לבן אפור")) {
 						color= 3;	
 						JSONObject object=new JSONObject();
 						object.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
-						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","בעיה בייצור מלחי מרה/תפקוד כיס המרה"));
+						sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיה רפואית שדורש התייחסות בעקבות צבע הצואה",object,"3","בעיה בייצור מלחי מרה/תפקוד כיס המרה"));
 					}
 				}
 				if(color!=3) {
@@ -803,8 +798,6 @@ public class Asker {
 			}
 		}	
 	}
-	
-	//========================================Secretion===========================================//
 	//==========================================Secretion=============================================//
 	void Secretion(String[] date) throws Exception {
 		int color = 1;
@@ -835,8 +828,6 @@ public class Asker {
 			}
 		}
 	}
-	
-	//========================================SolidFood===========================================//
 	//==========================================SolidFood=============================================//
 	void SolidFood(String[] date) throws Exception {
 		int color =1;
@@ -860,7 +851,6 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("אכל מעבר למנה")) {
 					color= 2;
 				}
-				//sendColorAlert(SolidFood.getString("eventId"),"SolidFood",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -876,8 +866,6 @@ public class Asker {
 			}
 		}
 	}
-	
-	//=========================================Vomitus============================================//
 	//==========================================Vomitus===============================================//
 	void Vomitus(String[] date) throws Exception {
 		int color = 1;
@@ -904,8 +892,6 @@ public class Asker {
 			}
 		}
 	}
-	
-	//==========================================Urine=============================================//
 	//==========================================Urine=================================================//
 	void Urine(String[] date) throws Exception {
 		int color = 1;
@@ -947,8 +933,6 @@ public class Asker {
 			}
 		}
 	}
-
-	//==========================================Sleep=============================================//
 	//==========================================Sleep=================================================//
 	void Sleep(String[] date) throws Exception {
 		int color = 1;
@@ -977,8 +961,6 @@ public class Asker {
 			}
 		}
 	}
-	
-	//==========================================Fever=============================================//
 	//==========================================Fever=================================================//
 	void Fever(String[] date) throws Exception{
 		int color = 1;
@@ -992,18 +974,18 @@ public class Asker {
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
 					System.out.println();
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","להלביש את הילד/לכסות אותו",eventsLeading,"3","טמפרטורה מתחת לטווח תקין"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5] +" +0000","להלביש את הילד/לכסות אותו",eventsLeading,"3","טמפרטורה מתחת לטווח תקין"));
 				}
 				else if(Double.parseDouble(jsonEvent.getJSONObject(i).getString("tempreture"))<=38 && Double.parseDouble(jsonEvent.getJSONObject(i).getString("tempreture"))>=37.5) { 
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(2),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","יש למדוד את חום הילד שוב בעוד כשעתיים",eventsLeading,"3","טמפרטורה קצת מעל לטווח תקין"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(2),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","יש למדוד את חום הילד שוב בעוד כשעתיים",eventsLeading,"3","טמפרטורה קצת מעל לטווח תקין"));
 				}
 				else if(Double.parseDouble(jsonEvent.getJSONObject(i).getString("tempreture"))>38.0) {
 					color= 3; 
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[0]+"/"+WhatIsTheDate(0)[1]+"/"+WhatIsTheDate(0)[2]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","עדכון הורים להגיע לאסוף",eventsLeading,"3","טמפרטורה מעל לטווח תקין"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","עדכון הורים להגיע לאסוף",eventsLeading,"3","טמפרטורה מעל לטווח תקין"));
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
@@ -1086,9 +1068,7 @@ public class Asker {
 				}
 			}
 		}
-		
-	
-	
+			
 	//=====================================================================using function====================================================================//
 
 	//=====================================================================TIMEFunctions====================================================================//
