@@ -40,7 +40,7 @@ public class Asker {
 		countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",2,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
 		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Cough",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של שיעול היום","3","3",1);
 		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Rash",1,"קיים חשש לסוג אלרגיה לא ידוע","אירועים חוזרים של פריחה היום","3","3",1);
-		if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
+	/*	if(checkTime(MIDLLEHOUR,MIDLLEMIN,MIDLLEHOUR,MIDLLEMIN+3)) {
 			countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 			countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
 			countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",2,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
@@ -73,7 +73,7 @@ public class Asker {
 				countermsg += XDaysEgoWaterCheck(getter.getKidsJsons());
 				countermsg += DailyVomitusCheck(2,WhatIsTheDate(0), getter.getKidsJsons());
 				}
-			 } 
+			 } */
 		return countermsg;
 		}
 	
@@ -101,7 +101,7 @@ public class Asker {
 				}
 				if(counter>amount) { 
 					try {
-						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5],"קיים חשש שהילד מפתח מחלה" ,object,"3","אירועים חוזרים של חום במידה מועטה חריג בימים האחרונים"));
+						sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+ " +0000","קיים חשש שהילד מפתח מחלה" ,object,"3","אירועים חוזרים של חום במידה מועטה חריג בימים האחרונים"));
 						value++;
 						for(int i=0;i<object.length();i++){
 							JSONObject event=getter.getJsonsByID("fever",object.getString(String.valueOf(i+1)));
@@ -291,8 +291,8 @@ public class Asker {
 			JSONObject counetrAlerts = new JSONObject();
 			JSONArray jsonEvent = getter.getJsonsWithDate("Vomitus",today[2]+"-"+today[1]+"-"+today[0]);
 			if(time==2) {
-				jsonEvent.put(getter.getJsonsWithDate("Vomitus",WhatIsTheDate(1)[0]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[2]));
-				jsonEvent.put(getter.getJsonsWithDate("Vomitus",WhatIsTheDate(2)[0]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[2]));
+				jsonEvent.put(getter.getJsonsWithDate("Vomitus",WhatIsTheDate(1)[2]+"-"+WhatIsTheDate(1)[1]+"-"+WhatIsTheDate(1)[0]));
+				jsonEvent.put(getter.getJsonsWithDate("Vomitus",WhatIsTheDate(2)[2]+"-"+WhatIsTheDate(2)[1]+"-"+WhatIsTheDate(2)[0]));
 			}
 			for(int j=0;j<kids.length();j++) {	
 				JSONObject object = new JSONObject();
@@ -358,7 +358,6 @@ public class Asker {
 					}
 				}
 				if(time == 1) {
-					
 					if(consumedAmount!=0 &&amount!=0) {
 						if(amount/consumedAmount<0.75) { 		// if he drink less than he actualy need near to the end of the day
 							try {
@@ -450,8 +449,6 @@ public class Asker {
 		}
 		return value;
 	}
-	
-	//check the amount of food the every kid eat today
 	int DailyFoodCheck(String[] today,int time,JSONArray kids) throws Exception {
 		int value=0,numOfEvents=1;
 		try {
@@ -518,8 +515,6 @@ public class Asker {
 		}
 		return value;
 	}
-	
-	//check if the kid was" in the "toalet" today
 	int DailyDiaperCheck(String[] today,int time,JSONArray kids) throws Exception {
 		int value=0,numOfEvents=1;
 		try {
@@ -583,10 +578,6 @@ public class Asker {
 		}
 		return value;
 	}
-	
-	//function that get time of start and the end and check if now is between  them
-
-	//function that check the amount of urine in cople days ego
 	int XDaysEgoUrineDiaperCheck(JSONArray kids) throws Exception{
 		int value=0,numOfEvents=1;
 		try {
@@ -627,8 +618,6 @@ public class Asker {
 		return value;
 	}
 	
-	
-//===================================================================COLOR FUNCTIONS==============================================================//
 	
 	//=====================================================================ColorsQuerys===============================================================//
 	//the function that call all the colors querys
@@ -673,7 +662,6 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("אכל מעבר למנה")) {
 					color= 2;
 				}
-				//sendColorAlert(LiquidFoods.getString("eventID"),"LiquidFood",color);
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
 			    object.put("eventDate",jsonEvent.getJSONObject(i).getString("eventDate"));
@@ -688,7 +676,6 @@ public class Asker {
 			}
 		}
 	}
-
 	//==========================================Parasites=============================================//
 	void Parasites(String[] date) throws Exception {
 		int color=1;
@@ -707,7 +694,7 @@ public class Asker {
 					color= 3;
 					JSONObject eventsLeading=new JSONObject();
 					eventsLeading.put(String.valueOf(1), jsonEvent.getJSONObject(i).getString("eventID"));
-					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
+					sender.sendLogicAlert(new LogicSystemAlert(jsonEvent.getJSONObject(i).getInt("childID"),String.valueOf(color),WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0000","קיימת חשש לבעיית תולעים לתת דיווח להורים",eventsLeading,"3","דיווח מזיקים"));
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
@@ -727,13 +714,10 @@ public class Asker {
 		JSONArray jsonEvent = getter.getJsonsWithDate("Cough",date[2]+"-"+date[1]+"-"+date[0]);
 		for(int i=0;i<jsonEvent.length();i++) {
 			if(jsonEvent.getJSONObject(i).getInt("level")==0) {
-				color = 1;
+				color = 2;
 				countercolorsEvents++;
 				if(jsonEvent.getJSONObject(i).getString("type").equals("טורדני")) {
 					color = 3;
-				}
-				else if(jsonEvent.getJSONObject(i).getString("type").equals("לח")) {
-					color= 2;
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
@@ -813,7 +797,7 @@ public class Asker {
 					color = 3;
 				}
 				else if(jsonEvent.getJSONObject(i).getString("type").equals("נזלת")) {
-					color = 3;
+					color = 2;
 				}
 				JSONObject object = new JSONObject();
 			    object.put("level",color);
@@ -842,7 +826,7 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי מנה")) {
 					color= 3;
 				}
-				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעלה לחצי מנה")) {
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעל חצי מנה")) {
 					color= 2;
 				}
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("סיים מנה")) {
@@ -1068,8 +1052,8 @@ public class Asker {
 			}
 		}
 			
-	//=====================================================================using function====================================================================//
-
+	
+	
 	//=====================================================================TIMEFunctions====================================================================//
 	//functions the check if the time now is between 2 times
 	boolean checkTime(int starthour,int startmin,int finishhour,int finishmin) { 
