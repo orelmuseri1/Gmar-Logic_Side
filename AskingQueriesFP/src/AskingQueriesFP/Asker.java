@@ -39,7 +39,7 @@ public class Asker {
 		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getter.getKidsJsons());
 		countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getter.getKidsJsons());
-		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של נזלת היום","3","3",1);
+		countermsg += DailyCheckMoreThenEvent(WhatIsTheDate(0),getter.getKidsJsons(),"Secretion",2,"קיים חשש שהילד מפתח מחלה","אירועים חוזרים של הפרשות היום","3","3",1);
 		countermsg += FeverCheck(WhatIsTheDate(0),getter.getKidsJsons(),2,1);
 		countermsg += DailyWaterCheck(1,WhatIsTheDate(0),getter.getKidsJsons()); 
 		countermsg += DailyCheckMoreThenEventWithStringParm(WhatIsTheDate(0),getter.getKidsJsons(),"Feces",2,"אירועים חוזרים של צואה מסוג שילשול/מיימי","אירועים חוזרים של צואה מסוג שילשול/מיימי","3","3",1,"texture","שילשול/מיימי");
@@ -375,7 +375,7 @@ public class Asker {
 						}
 					}else{
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300", "לתת לילד מים",object,"1","הילד לא שתה היום"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300", "לתת לילד מים",object,"2","הילד לא שתה היום"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -396,7 +396,7 @@ public class Asker {
 						}
 					}else {
 						try {
-							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300", "לתת לילד מים",object,"1","הילד לא שתה היום"));
+							sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(j).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300", "לתת לילד מים",object,"2","הילד לא שתה היום"));
 							value++;
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
