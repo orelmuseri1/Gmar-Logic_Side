@@ -3,24 +3,24 @@ package AskingQueriesFP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LogicSystemAlert extends BasicAlert {
-	String rule;
-	public LogicSystemAlert(int childID, String level, String alertDate, String actionNeeded,JSONObject eventsLeading,String type,String rule) {
-		super(childID, level,alertDate, actionNeeded,type,eventsLeading);
-		this.rule=rule;
-
-	}
-	
-
-
-	public String getRule() {
-		return rule;
+public class DevelopmentAlert extends BasicAlert {
+	String timePast;
+	public DevelopmentAlert(int childID, String level, String alertDate, String actionNeeded, String type,
+			JSONObject EventsLeading,String timePast) {
+		super(childID, level, alertDate, actionNeeded, type, EventsLeading);
+		this.timePast=timePast;
 	}
 
-	public void setRule(String rule) {
-		this.rule = rule;
+
+	public String getTimePast() {
+		return timePast;
 	}
 
+
+
+	public void setTimePast(String timePast) {
+		this.timePast = timePast;
+	}
 	
 	JSONObject getJson() throws JSONException {
 		JSONObject object = new JSONObject();
@@ -29,11 +29,13 @@ public class LogicSystemAlert extends BasicAlert {
 	    object.put("childID",String.valueOf(this.getChildID()));
 	    object.put("level", this.getLevel());
 	    object.put("type", this.getType());
-	    object.put("timePast","");
+	    object.put("timePast",this.getTimePast());
 	    object.put("responsibleEvents", this.getEventsLeading());
 	    object.put("actionNeeded",this.getActionNeeded());
 	    return object;
 		
 	}
+
+
 
 }

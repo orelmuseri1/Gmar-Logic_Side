@@ -37,7 +37,6 @@ public class SendAllert {
 		conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
 		conn.setChunkedStreamingMode(0);
 		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		//System.out.println(object.toString());
 		wr.write(object.toString());
 		wr.flush();
 		StringBuilder sb = new StringBuilder();  
@@ -51,9 +50,8 @@ public class SendAllert {
 			br.close();
 
 			JSONObject myResponse = new JSONObject(sb.toString());
-			System.out.println(myResponse); 
 				} else {
-				    System.out.println(conn.getResponseMessage());  
+				   // System.out.println(conn.getResponseMessage());  
 				}  
 		return uniqueID;
 		
@@ -62,7 +60,6 @@ public class SendAllert {
 	 */
 
 	String sendLogicAlert(LogicSystemAlert alert) throws Exception{	
-			//URL	url = new URL("http://127.0.0.1:5000/alerts/"+alert.getJson().getString("alertID")); //  http://193.106.55.183/alerts/LogicSystemAlert/1  https://httpbin.org/post
 			URL	url = new URL("http://193.106.55.183/alerts/"+alert.getJson().getString("alertID"));
 			JSONObject object = alert.getJson();
 		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -74,7 +71,7 @@ public class SendAllert {
 			conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
 			//conn.setChunkedStreamingMode(0);
 			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-			System.out.println(object.toString());
+			//System.out.println(object.toString());
 			wr.write(object.toString());
 			wr.flush();
 			StringBuilder sb = new StringBuilder();  
@@ -88,7 +85,7 @@ public class SendAllert {
 				br.close();
 
 					} else {
-					    System.out.println(conn.getResponseMessage());  
+					    //System.out.println(conn.getResponseMessage());  
 					}  
 			return object.getString("alertID");
 			
@@ -112,7 +109,7 @@ public class SendAllert {
 		conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
 		conn.setChunkedStreamingMode(0);
 		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		System.out.println(object.toString());
+		//System.out.println(object.toString());
 		wr.write(object.toString());
 		wr.flush();
 		StringBuilder sb = new StringBuilder();  
@@ -125,10 +122,8 @@ public class SendAllert {
 				  }
 			br.close();
 
-			JSONObject myResponse = new JSONObject(sb.toString());
-			System.out.println(myResponse);
 				} else {
-				    System.out.println(conn.getResponseMessage());  
+				   // System.out.println(conn.getResponseMessage());  
 				}
 		return 0;
 	}
@@ -145,7 +140,7 @@ public class SendAllert {
 			conn.setDoInput(true);
 			conn.setRequestProperty("Accept", "application/json; charsets=UTF_8");
 			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-			System.out.println(object.toString());
+			//System.out.println(object.toString());
 			wr.write(object.toString());
 			wr.flush();
 			StringBuilder sb = new StringBuilder();  
@@ -161,7 +156,7 @@ public class SendAllert {
 				/*JSONObject myResponse = new JSONObject(sb.toString());
 				System.out.println(myResponse);*/
 					} else {
-					    System.out.println(conn.getResponseMessage());  
+					  //  System.out.println(conn.getResponseMessage());  
 					}
 			return 0;
 		}
@@ -171,7 +166,6 @@ public class SendAllert {
 		
 	ResultSet getSet(Connection myConn,String tableName,String[] date) throws SQLException {
 		Statement mystmt = myConn.createStatement();
-		//System.out.println("SELECT * FROM "+tableName+" WHERE eventDate = "+date[0]+"/"+date[1]+"/"+date[2]);
 		String giveMeAllEvents= "SELECT * FROM "+tableName+" WHERE STRCMP(SUBSTRING(eventDate, 1,10),"+"\""+date[0]+"/"+date[1]+"/"+date[2]+"\")=0";
 		ResultSet events= mystmt.executeQuery(giveMeAllEvents);//sent the query to get all the kids
 		return events;

@@ -66,7 +66,7 @@ public class GetEvent {
 	JSONArray jsonarray;
 	JSONObject myResponse;
 	url = new URL("http://193.106.55.183/events/"+table+"Events");
-	System.out.println("http://193.106.55.183/events/"+table+"Events");
+	//System.out.println("http://193.106.55.183/events/"+table+"Events");
 	HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 	conn.setRequestMethod("GET");
 	conn.setRequestProperty("Content-Type", "application/json;");
