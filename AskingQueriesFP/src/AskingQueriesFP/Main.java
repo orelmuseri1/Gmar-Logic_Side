@@ -5,9 +5,8 @@ public class Main {
 	
 	
 	public static void main(String[] args) throws Exception {
-		//Asker asker = new Asker();
-	//	asker.ask();
-
+		Asker asker = new Asker();
+		asker.ask();
 		}
 	
 	

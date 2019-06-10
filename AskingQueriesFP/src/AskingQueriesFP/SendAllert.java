@@ -59,7 +59,7 @@ public class SendAllert {
 	}
 	 */
 
-	String sendLogicAlert(LogicSystemAlert alert) throws Exception{	
+	String sendLogicAlert(BasicAlert alert) throws Exception{	
 			URL	url = new URL("http://193.106.55.183/alerts/"+alert.getJson().getString("alertID"));
 			JSONObject object = alert.getJson();
 		    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -85,7 +85,7 @@ public class SendAllert {
 				br.close();
 
 					} else {
-					    //System.out.println(conn.getResponseMessage());  
+					  //  System.out.println(conn.getResponseMessage());  
 					}  
 			return object.getString("alertID");
 			

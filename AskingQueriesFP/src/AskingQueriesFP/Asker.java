@@ -35,6 +35,7 @@ public class Asker {
 	
 	int ask() throws Exception {
 		int countermsg = 0;
+		Development(getter.getKidsJsons(),"Developmental");
 		countermsg +=  checkColorsAlerts(WhatIsTheDate(0));
 		countermsg += DailyVomitusCheck(1, WhatIsTheDate(0), getter.getKidsJsons());
 		countermsg += DailyFoodCheck(WhatIsTheDate(0),2,getter.getKidsJsons());
@@ -628,6 +629,7 @@ public class Asker {
 		int[] age;
 		int ageByDays;
 		boolean flag=false;
+		JSONObject object = new JSONObject();
 		String[] DevelopmentEvent =development.getDevelopmentEvents();
 		try {
 			JSONArray jsonEvent = getter.getJsons(Table);
@@ -636,17 +638,17 @@ public class Asker {
 				for(int i=0;i<DevelopmentEvent.length;i++) {
 					if(development.getMonthEvent(DevelopmentEvent[i])<=age[0]) {
 						for(int j=0;j< jsonEvent.length();j++){																			//pass all the events of the kid
-							if(jsonEvent.getJSONObject(j).getString("childID").equals(kids.getJSONObject(k).getString("childID"))&&jsonEvent.getJSONObject(j).getString("eventType").equals(DevelopmentEvent[i])) {
-							flag=true;
+							if(jsonEvent.getJSONObject(j).getString("childID").equals(kids.getJSONObject(k).getString("childID"))&& jsonEvent.getJSONObject(j).getInt("eventType") == development.getNumberEvent(DevelopmentEvent[i])) {
+								flag=true;
 							}
 						} 
 						if(!flag) {
 							ageByDays=(age[0]*30)+age[1];
-							if(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30)>30) {
-								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(k).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300",DevelopmentEvent[i]+"חריגה התפתחותית מעל חודש",null,"1","זמן שעבר בימים" +String.valueOf(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30))));
+							if(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30)>14) {
+									sender.sendLogicAlert(new DevelopmentAlert(kids.getJSONObject(k).getInt("childID"),"3",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300",DevelopmentEvent[i]+" "+"חריגה התפתחותית מעל שבועיים",object,"1","זמן שעבר בימים" +String.valueOf(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30))));
 							}
 							else if(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30)>7){
-								sender.sendLogicAlert(new LogicSystemAlert(kids.getJSONObject(k).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300", DevelopmentEvent[i]+"חריגה התפתחותית מעל שבוע",null,"1","זמן שעבר בימים" +String.valueOf(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30))));
+								sender.sendLogicAlert(new DevelopmentAlert(kids.getJSONObject(k).getInt("childID"),"2",WhatIsTheDate(0)[2]+"-"+WhatIsTheDate(0)[1]+"-"+WhatIsTheDate(0)[0]+" "+WhatIsTheDate(0)[3]+":"+WhatIsTheDate(0)[4]+ ":" + WhatIsTheDate(0)[5]+" +0300", DevelopmentEvent[i]+" "+"חריגה התפתחותית מעל שבוע",object,"1","זמן שעבר בימים" +String.valueOf(ageByDays-(development.getMonthEvent(DevelopmentEvent[i])*30))));
 							}
 							value++;
 						}
@@ -695,7 +697,7 @@ public class Asker {
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מתחת לחצי מנה")) {
 					color= 3;
 				}
-				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעלה לחצי מנה")) {
+				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("מעלה חצי מנה")) {
 					color= 2;
 				}
 				else if(jsonEvent.getJSONObject(i).getString("consumedAmount").equals("סיים מנה")) {
